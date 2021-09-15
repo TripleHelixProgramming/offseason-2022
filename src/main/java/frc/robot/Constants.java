@@ -18,6 +18,33 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
  */
 public final class Constants {
   public static final class DriveConstants {
+
+    public static final int kPigeonPort = 20;
+
+    public static final class SparkCAN {
+      public static final int kRearRightDriveMotorPort = 10;
+      public static final int kFrontRightDriveMotorPort = 12;
+      public static final int kFrontLeftDriveMotorPort = 22;
+      public static final int kRearLeftDriveMotorPort = 24;
+  
+      public static final int kRearRightTurningMotorPort = 11;  
+      public static final int kFrontRightTurningMotorPort = 13;
+      public static final int kFrontLeftTurningMotorPort = 23;
+      public static final int kRearLeftTurningMotorPort = 25;
+    }
+
+    public static final class TalonCAN {
+      public static final int kFrontLeftDriveMotorPort = 0;
+      public static final int kRearLeftDriveMotorPort = 2;
+      public static final int kFrontRightDriveMotorPort = 4;
+      public static final int kRearRightDriveMotorPort = 6;
+  
+      public static final int kFrontLeftTurningMotorPort = 1;
+      public static final int kRearLeftTurningMotorPort = 3;
+      public static final int kFrontRightTurningMotorPort = 5;
+      public static final int kRearRightTurningMotorPort = 7;  
+    }
+
     public static final int kFrontLeftDriveMotorPort = 0;
     public static final int kRearLeftDriveMotorPort = 2;
     public static final int kFrontRightDriveMotorPort = 4;
@@ -27,6 +54,30 @@ public final class Constants {
     public static final int kRearLeftTurningMotorPort = 3;
     public static final int kFrontRightTurningMotorPort = 5;
     public static final int kRearRightTurningMotorPort = 7;
+
+    public static final int[] kFrontLeftDriveEncoderPorts = new int[] {8, 9};
+    public static final int[] kRearLeftDriveEncoderPorts = new int[] {10, 11};
+    public static final int[] kFrontRightDriveEncoderPorts = new int[] {12, 13};
+    public static final int[] kRearRightDriveEncoderPorts = new int[] {14, 15};
+
+    public static final class CANCoder {
+      // Below provided by SparkMAX motors API.
+      // public static final int kFrontLeftDriveEncoderPort = 
+      // public static final int kRearLeftDriveEncoderPort =
+      // public static final int kFrontRightDriveEncoderPort =
+      // public static final int kRearRightDriveEncoderPort =
+
+      public static final int kRearRightTurningEncoderPort = 31;
+      public static final int kFrontRightTurningEncoderPort = 33;
+      public static final int kFrontLefTurningEncoderPort = 43;
+      public static final int kRearLeftTurningEncoderPort = 45;
+
+    }
+
+    public static final boolean kFrontLeftDriveEncoderReversed = false;
+    public static final boolean kRearLeftDriveEncoderReversed = true;
+    public static final boolean kFrontRightDriveEncoderReversed = false;
+    public static final boolean kRearRightDriveEncoderReversed = true;
 
     public static final int[] kFrontLeftTurningEncoderPorts = new int[] {0, 1};
     public static final int[] kRearLeftTurningEncoderPorts = new int[] {2, 3};
@@ -38,15 +89,6 @@ public final class Constants {
     public static final boolean kFrontRightTurningEncoderReversed = false;
     public static final boolean kRearRightTurningEncoderReversed = true;
 
-    public static final int[] kFrontLeftDriveEncoderPorts = new int[] {8, 9};
-    public static final int[] kRearLeftDriveEncoderPorts = new int[] {10, 11};
-    public static final int[] kFrontRightDriveEncoderPorts = new int[] {12, 13};
-    public static final int[] kRearRightDriveEncoderPorts = new int[] {14, 15};
-
-    public static final boolean kFrontLeftDriveEncoderReversed = false;
-    public static final boolean kRearLeftDriveEncoderReversed = true;
-    public static final boolean kFrontRightDriveEncoderReversed = false;
-    public static final boolean kRearRightDriveEncoderReversed = true;
 
     public static final double kTrackWidth = 0.5;
     // Distance between centers of right and left wheels on robot

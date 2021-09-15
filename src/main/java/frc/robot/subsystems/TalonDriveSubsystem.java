@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -14,13 +15,11 @@ import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import com.ctre.phoenix.sensors.PigeonIMU;
-
 @SuppressWarnings("PMD.ExcessiveImports")
-public class DriveSubsystem extends SubsystemBase {
+public class TalonDriveSubsystem extends SubsystemBase {
   // Robot swerve modules
-  private final SwerveModule m_frontLeft =
-      new SwerveModule(
+  private final TalonSwerveModule m_frontLeft =
+      new TalonSwerveModule(
           DriveConstants.kFrontLeftDriveMotorPort,
           DriveConstants.kFrontLeftTurningMotorPort,
           DriveConstants.kFrontLeftDriveEncoderPorts,
@@ -28,8 +27,8 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kFrontLeftDriveEncoderReversed,
           DriveConstants.kFrontLeftTurningEncoderReversed);
 
-  private final SwerveModule m_rearLeft =
-      new SwerveModule(
+  private final TalonSwerveModule m_rearLeft =
+      new TalonSwerveModule(
           DriveConstants.kRearLeftDriveMotorPort,
           DriveConstants.kRearLeftTurningMotorPort,
           DriveConstants.kRearLeftDriveEncoderPorts,
@@ -37,8 +36,8 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kRearLeftDriveEncoderReversed,
           DriveConstants.kRearLeftTurningEncoderReversed);
 
-  private final SwerveModule m_frontRight =
-      new SwerveModule(
+  private final TalonSwerveModule m_frontRight =
+      new TalonSwerveModule(
           DriveConstants.kFrontRightDriveMotorPort,
           DriveConstants.kFrontRightTurningMotorPort,
           DriveConstants.kFrontRightDriveEncoderPorts,
@@ -46,8 +45,8 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kFrontRightDriveEncoderReversed,
           DriveConstants.kFrontRightTurningEncoderReversed);
 
-  private final SwerveModule m_rearRight =
-      new SwerveModule(
+  private final TalonSwerveModule m_rearRight =
+      new TalonSwerveModule(
           DriveConstants.kRearRightDriveMotorPort,
           DriveConstants.kRearRightTurningMotorPort,
           DriveConstants.kRearRightDriveEncoderPorts,
@@ -56,25 +55,20 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kRearRightTurningEncoderReversed);
 
   // The gyro sensor
-  private final Gyro m_gyro = null;
-  
-  private final PigeonIMU m_pigeon = new PigeonIMU(DriveConstants.kPigeonPort);
-
+  private final Gyro m_gyro = new ADXRS450_Gyro();
 
   // Odometry class for tracking robot pose
-  
-  SwerveDriveOdometry m_odometry;  
+  SwerveDriveOdometry m_odometry =
+      new SwerveDriveOdometry(DriveConstants.kDriveKinematics, m_gyro.getRotation2d());
 
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {
-    m_odometry = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, getHeading());
-  }
+  public TalonDriveSubsystem() {}
 
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
     m_odometry.update(
-        getHeading(),
+        new Rotation2d(getHeading()),
         m_frontLeft.getState(),
         m_rearLeft.getState(),
         m_frontRight.getState(),
@@ -112,7 +106,7 @@ public class DriveSubsystem extends SubsystemBase {
     var swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(
             fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getHeading())
+                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
     SwerveDriveKinematics.normalizeWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
@@ -146,20 +140,16 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    // m_gyro.reset();
-    m_pigeon.setYaw(0.0);
+    m_gyro.reset();
   }
 
   /**
    * Returns the heading of the robot.
    *
-   * @return the robot's heading as a Rotation2d
+   * @return the robot's heading in degrees, from -180 to 180
    */
-  public Rotation2d getHeading() {
-    // return m_gyro.getRotation2d().getDegrees();
-    double[] ypr_deg = {0.0, 0.0, 0.0};
-    m_pigeon.getYawPitchRoll(ypr_deg);
-    return new Rotation2d(Math.toRadians(ypr_deg[0]));
+  public double getHeading() {
+    return m_gyro.getRotation2d().getDegrees();
   }
 
   /**
@@ -167,7 +157,7 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @return The turn rate of the robot, in degrees per second
    */
-  // public double getTurnRate() {
-  //   return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
-  // }
+  public double getTurnRate() {
+    return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  }
 }

@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -17,56 +18,53 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.sensors.PigeonIMU;
 
 @SuppressWarnings("PMD.ExcessiveImports")
-public class DriveSubsystem extends SubsystemBase {
+public class SparkDriveSubsystem extends SubsystemBase {
   // Robot swerve modules
-  private final SwerveModule m_frontLeft =
-      new SwerveModule(
-          DriveConstants.kFrontLeftDriveMotorPort,
-          DriveConstants.kFrontLeftTurningMotorPort,
-          DriveConstants.kFrontLeftDriveEncoderPorts,
-          DriveConstants.kFrontLeftTurningEncoderPorts,
+  private final SparkMaxSwerveModule m_frontLeft =
+      new SparkMaxSwerveModule(
+          DriveConstants.SparkCAN.kFrontLeftDriveMotorPort,
+          DriveConstants.SparkCAN.kFrontLeftTurningMotorPort,
+//          DriveConstants.kFrontLeftDriveEncoderPorts,
+          DriveConstants.CANCoder.kFrontLefTurningEncoderPort,
           DriveConstants.kFrontLeftDriveEncoderReversed,
           DriveConstants.kFrontLeftTurningEncoderReversed);
 
-  private final SwerveModule m_rearLeft =
-      new SwerveModule(
-          DriveConstants.kRearLeftDriveMotorPort,
-          DriveConstants.kRearLeftTurningMotorPort,
-          DriveConstants.kRearLeftDriveEncoderPorts,
-          DriveConstants.kRearLeftTurningEncoderPorts,
+  private final SparkMaxSwerveModule m_rearLeft =
+      new SparkMaxSwerveModule(
+          DriveConstants.SparkCAN.kRearLeftDriveMotorPort,
+          DriveConstants.SparkCAN.kRearLeftTurningMotorPort,
+//          DriveConstants.kRearLeftDriveEncoderPorts,
+          DriveConstants.CANCoder.kRearLeftTurningEncoderPort,
           DriveConstants.kRearLeftDriveEncoderReversed,
           DriveConstants.kRearLeftTurningEncoderReversed);
 
-  private final SwerveModule m_frontRight =
-      new SwerveModule(
-          DriveConstants.kFrontRightDriveMotorPort,
-          DriveConstants.kFrontRightTurningMotorPort,
-          DriveConstants.kFrontRightDriveEncoderPorts,
-          DriveConstants.kFrontRightTurningEncoderPorts,
+  private final SparkMaxSwerveModule m_frontRight =
+      new SparkMaxSwerveModule(
+          DriveConstants.SparkCAN.kFrontRightDriveMotorPort,
+          DriveConstants.SparkCAN.kFrontRightTurningMotorPort,
+//          DriveConstants.kFrontRightDriveEncoderPorts,
+          DriveConstants.CANCoder.kFrontRightTurningEncoderPort,
           DriveConstants.kFrontRightDriveEncoderReversed,
           DriveConstants.kFrontRightTurningEncoderReversed);
 
-  private final SwerveModule m_rearRight =
-      new SwerveModule(
-          DriveConstants.kRearRightDriveMotorPort,
-          DriveConstants.kRearRightTurningMotorPort,
-          DriveConstants.kRearRightDriveEncoderPorts,
-          DriveConstants.kRearRightTurningEncoderPorts,
+  private final SparkMaxSwerveModule m_rearRight =
+      new SparkMaxSwerveModule(
+          DriveConstants.SparkCAN.kRearRightDriveMotorPort,
+          DriveConstants.SparkCAN.kRearRightTurningMotorPort,
+//          DriveConstants.kRearRightDriveEncoderPorts,
+          DriveConstants.CANCoder.kRearRightTurningEncoderPort,
           DriveConstants.kRearRightDriveEncoderReversed,
           DriveConstants.kRearRightTurningEncoderReversed);
 
   // The gyro sensor
-  private final Gyro m_gyro = null;
-  
-  private final PigeonIMU m_pigeon = new PigeonIMU(DriveConstants.kPigeonPort);
-
+//  private final Gyro m_gyro = new ADXRS450_Gyro();
+private final PigeonIMU m_pigeon = new PigeonIMU(DriveConstants.kPigeonPort);
 
   // Odometry class for tracking robot pose
-  
-  SwerveDriveOdometry m_odometry;  
+  SwerveDriveOdometry m_odometry;
 
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {
+  public SparkDriveSubsystem() {
     m_odometry = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, getHeading());
   }
 
@@ -96,7 +94,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(pose, m_gyro.getRotation2d());
+    m_odometry.resetPosition(pose, getHeading());
   }
 
   /**
@@ -146,7 +144,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    // m_gyro.reset();
+//    m_gyro.reset();
     m_pigeon.setYaw(0.0);
   }
 
@@ -161,6 +159,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_pigeon.getYawPitchRoll(ypr_deg);
     return new Rotation2d(Math.toRadians(ypr_deg[0]));
   }
+
 
   /**
    * Returns the turn rate of the robot.
