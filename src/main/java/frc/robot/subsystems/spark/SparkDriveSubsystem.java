@@ -2,77 +2,91 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.spark;
 
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import com.ctre.phoenix.sensors.PigeonIMU;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 @SuppressWarnings("PMD.ExcessiveImports")
-public class TalonDriveSubsystem extends SubsystemBase {
+public class SparkDriveSubsystem extends SubsystemBase {
   // Robot swerve modules
-  private final TalonSwerveModule m_frontLeft =
-      new TalonSwerveModule(
-          DriveConstants.kFrontLeftDriveMotorPort,
-          DriveConstants.kFrontLeftTurningMotorPort,
-          DriveConstants.kFrontLeftDriveEncoderPorts,
-          DriveConstants.kFrontLeftTurningEncoderPorts,
+  private final SparkMaxSwerveModule m_frontLeft =
+      new SparkMaxSwerveModule(
+          DriveConstants.SparkCAN.kFrontLeftDriveMotorPort,
+          DriveConstants.SparkCAN.kFrontLeftTurningMotorPort,
+          DriveConstants.CANCoder.kFrontLefTurningEncoderPort,
           DriveConstants.kFrontLeftDriveEncoderReversed,
           DriveConstants.kFrontLeftTurningEncoderReversed);
 
-  private final TalonSwerveModule m_rearLeft =
-      new TalonSwerveModule(
-          DriveConstants.kRearLeftDriveMotorPort,
-          DriveConstants.kRearLeftTurningMotorPort,
-          DriveConstants.kRearLeftDriveEncoderPorts,
-          DriveConstants.kRearLeftTurningEncoderPorts,
+  private final SparkMaxSwerveModule m_rearLeft =
+      new SparkMaxSwerveModule(
+          DriveConstants.SparkCAN.kRearLeftDriveMotorPort,
+          DriveConstants.SparkCAN.kRearLeftTurningMotorPort,
+          DriveConstants.CANCoder.kRearLeftTurningEncoderPort,
           DriveConstants.kRearLeftDriveEncoderReversed,
           DriveConstants.kRearLeftTurningEncoderReversed);
 
-  private final TalonSwerveModule m_frontRight =
-      new TalonSwerveModule(
-          DriveConstants.kFrontRightDriveMotorPort,
-          DriveConstants.kFrontRightTurningMotorPort,
-          DriveConstants.kFrontRightDriveEncoderPorts,
-          DriveConstants.kFrontRightTurningEncoderPorts,
+  private final SparkMaxSwerveModule m_frontRight =
+      new SparkMaxSwerveModule(
+          DriveConstants.SparkCAN.kFrontRightDriveMotorPort,
+          DriveConstants.SparkCAN.kFrontRightTurningMotorPort,
+          DriveConstants.CANCoder.kFrontRightTurningEncoderPort,
           DriveConstants.kFrontRightDriveEncoderReversed,
           DriveConstants.kFrontRightTurningEncoderReversed);
 
-  private final TalonSwerveModule m_rearRight =
-      new TalonSwerveModule(
-          DriveConstants.kRearRightDriveMotorPort,
-          DriveConstants.kRearRightTurningMotorPort,
-          DriveConstants.kRearRightDriveEncoderPorts,
-          DriveConstants.kRearRightTurningEncoderPorts,
+  private final SparkMaxSwerveModule m_rearRight =
+      new SparkMaxSwerveModule(
+          DriveConstants.SparkCAN.kRearRightDriveMotorPort,
+          DriveConstants.SparkCAN.kRearRightTurningMotorPort,
+          DriveConstants.CANCoder.kRearRightTurningEncoderPort,
           DriveConstants.kRearRightDriveEncoderReversed,
           DriveConstants.kRearRightTurningEncoderReversed);
 
   // The gyro sensor
-  private final Gyro m_gyro = new ADXRS450_Gyro();
+  private final PigeonIMU m_pigeon = new PigeonIMU(DriveConstants.kPigeonPort);
 
   // Odometry class for tracking robot pose
-  SwerveDriveOdometry m_odometry =
-      new SwerveDriveOdometry(DriveConstants.kDriveKinematics, m_gyro.getRotation2d());
+  SwerveDriveOdometry m_odometry;
 
   /** Creates a new DriveSubsystem. */
-  public TalonDriveSubsystem() {}
+  public SparkDriveSubsystem() {
+    m_odometry = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, getHeading());
+  }
 
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
     m_odometry.update(
-        new Rotation2d(getHeading()),
+        getHeading(),
         m_frontLeft.getState(),
         m_rearLeft.getState(),
         m_frontRight.getState(),
         m_rearRight.getState());
+
+    SmartDashboard.putNumber("Heading", getHeading().getDegrees());
+
+    SmartDashboard.putNumber("FrontLeft Velocity", m_frontLeft.getState().speedMetersPerSecond);
+    SmartDashboard.putNumber("FrontLeft Angle", m_frontLeft.getState().angle.getDegrees());
+
+    SmartDashboard.putNumber("FrontRight Velocity", m_frontRight.getState().speedMetersPerSecond);
+    SmartDashboard.putNumber("FrontRight Angle", m_frontRight.getState().angle.getDegrees());
+
+    SmartDashboard.putNumber("RearLeft Velocity", m_rearLeft.getState().speedMetersPerSecond);
+    SmartDashboard.putNumber("RearLeft Angle", m_rearLeft.getState().angle.getDegrees());
+
+    SmartDashboard.putNumber("RearRight Velocity", m_rearRight.getState().speedMetersPerSecond);
+    SmartDashboard.putNumber("RearRight Angle", m_rearRight.getState().angle.getDegrees());
+
   }
 
   /**
@@ -90,7 +104,7 @@ public class TalonDriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(pose, m_gyro.getRotation2d());
+    m_odometry.resetPosition(pose, getHeading());
   }
 
   /**
@@ -106,7 +120,7 @@ public class TalonDriveSubsystem extends SubsystemBase {
     var swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(
             fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
+                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getHeading())
                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
     SwerveDriveKinematics.normalizeWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
@@ -140,24 +154,28 @@ public class TalonDriveSubsystem extends SubsystemBase {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    m_gyro.reset();
+//    m_gyro.reset();
+    m_pigeon.setYaw(0.0);
   }
 
   /**
    * Returns the heading of the robot.
    *
-   * @return the robot's heading in degrees, from -180 to 180
+   * @return the robot's heading as a Rotation2d
    */
-  public double getHeading() {
-    return m_gyro.getRotation2d().getDegrees();
+  public Rotation2d getHeading() {
+    double[] ypr_deg = {0.0, 0.0, 0.0};
+    m_pigeon.getYawPitchRoll(ypr_deg);
+    return new Rotation2d(Math.toRadians(ypr_deg[0]));
   }
+
 
   /**
    * Returns the turn rate of the robot.
    *
    * @return The turn rate of the robot, in degrees per second
    */
-  public double getTurnRate() {
-    return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
-  }
+  // public double getTurnRate() {
+  //   return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  // }
 }

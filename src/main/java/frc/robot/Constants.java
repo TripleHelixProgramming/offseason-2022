@@ -121,6 +121,11 @@ public final class Constants {
 
     public static final int kEncoderCPR = 1024;
     public static final double kWheelDiameterMeters = 0.15;
+
+    // The drive encoder reports in RPM by default. Calculate the conversion factor
+    // to make it report in meters per second.
+    public static final double kDriveVelocityConversionFactor = (kWheelDiameterMeters * Math.PI) / 60.0;
+
     public static final double kDriveEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
         (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
