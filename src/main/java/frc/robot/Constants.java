@@ -93,9 +93,9 @@ public final class Constants {
 
     // Units are meters.
     // Distance between centers of right and left wheels on robot
-    public static final double kTrackWidth = 0.5;
+    public static final double kTrackWidth = 0.5715; // 22.5 in
     // Distance between front and back wheels on robot
-    public static final double kWheelBase = 0.7;
+    public static final double kWheelBase = 0.6223; // 24.5 in
     public static final SwerveDriveKinematics kDriveKinematics =
         new SwerveDriveKinematics(
             new Translation2d(kWheelBase / 2, kTrackWidth / 2),
@@ -123,7 +123,7 @@ public final class Constants {
     public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 2 * Math.PI;
 
     public static final int kEncoderCPR = 1024;
-    public static final double kWheelDiameterMeters = 0.15;
+    public static final double kWheelDiameterMeters = 0.09398; // 3.7 in
 
     // The drive encoder reports in RPM by default. Calculate the conversion factor
     // to make it report in meters per second.
