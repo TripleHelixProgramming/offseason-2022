@@ -60,7 +60,6 @@ public class SparkMaxSwerveModule {
 //    this.m_turningEncoder = new Encoder(turningEncoderPorts[0], turningEncoderPorts[1]);
     this.m_turningEncoder = new CANCoder(turningEncoderPort);
 
-
     // Set the distance per pulse for the drive encoder. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
@@ -77,6 +76,7 @@ public class SparkMaxSwerveModule {
     // This is the the angle through an entire rotation (2 * wpi::math::pi)
     // divided by the encoder resolution.
 //    m_turningEncoder.setDistancePerPulse(ModuleConstants.kTurningEncoderDistancePerPulse);
+// I do not believe this is required for the CANEncoder. .getPosition() returns angle in degrees.
 
     // Set whether turning encoder should be reversed or not
     m_turningEncoder.configSensorDirection(turningEncoderReversed);

@@ -20,37 +20,37 @@ public class TalonDriveSubsystem extends SubsystemBase {
   // Robot swerve modules
   private final TalonSwerveModule m_frontLeft =
       new TalonSwerveModule(
-          DriveConstants.kFrontLeftDriveMotorPort,
-          DriveConstants.kFrontLeftTurningMotorPort,
-          DriveConstants.kFrontLeftDriveEncoderPorts,
-          DriveConstants.kFrontLeftTurningEncoderPorts,
+          DriveConstants.TalonCAN.kFrontLeftDriveMotorPort,
+          DriveConstants.TalonCAN.kFrontLeftTurningMotorPort,
+          DriveConstants.Example.kFrontLeftDriveEncoderPorts,
+          DriveConstants.Example.kFrontLeftTurningEncoderPorts,
           DriveConstants.kFrontLeftDriveEncoderReversed,
           DriveConstants.kFrontLeftTurningEncoderReversed);
 
   private final TalonSwerveModule m_rearLeft =
       new TalonSwerveModule(
-          DriveConstants.kRearLeftDriveMotorPort,
-          DriveConstants.kRearLeftTurningMotorPort,
-          DriveConstants.kRearLeftDriveEncoderPorts,
-          DriveConstants.kRearLeftTurningEncoderPorts,
+          DriveConstants.TalonCAN.kRearLeftDriveMotorPort,
+          DriveConstants.TalonCAN.kRearLeftTurningMotorPort,
+          DriveConstants.Example.kRearLeftDriveEncoderPorts,
+          DriveConstants.Example.kRearLeftTurningEncoderPorts,
           DriveConstants.kRearLeftDriveEncoderReversed,
           DriveConstants.kRearLeftTurningEncoderReversed);
 
   private final TalonSwerveModule m_frontRight =
       new TalonSwerveModule(
-          DriveConstants.kFrontRightDriveMotorPort,
-          DriveConstants.kFrontRightTurningMotorPort,
-          DriveConstants.kFrontRightDriveEncoderPorts,
-          DriveConstants.kFrontRightTurningEncoderPorts,
+          DriveConstants.TalonCAN.kFrontRightDriveMotorPort,
+          DriveConstants.TalonCAN.kFrontRightTurningMotorPort,
+          DriveConstants.Example.kFrontRightDriveEncoderPorts,
+          DriveConstants.Example.kFrontRightTurningEncoderPorts,
           DriveConstants.kFrontRightDriveEncoderReversed,
           DriveConstants.kFrontRightTurningEncoderReversed);
 
   private final TalonSwerveModule m_rearRight =
       new TalonSwerveModule(
-          DriveConstants.kRearRightDriveMotorPort,
-          DriveConstants.kRearRightTurningMotorPort,
-          DriveConstants.kRearRightDriveEncoderPorts,
-          DriveConstants.kRearRightTurningEncoderPorts,
+          DriveConstants.TalonCAN.kRearRightDriveMotorPort,
+          DriveConstants.TalonCAN.kRearRightTurningMotorPort,
+          DriveConstants.Example.kRearRightDriveEncoderPorts,
+          DriveConstants.Example.kRearRightTurningEncoderPorts,
           DriveConstants.kRearRightDriveEncoderReversed,
           DriveConstants.kRearRightTurningEncoderReversed);
 

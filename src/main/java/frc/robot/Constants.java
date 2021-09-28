@@ -45,20 +45,27 @@ public final class Constants {
       public static final int kRearRightTurningMotorPort = 7;  
     }
 
-    public static final int kFrontLeftDriveMotorPort = 0;
-    public static final int kRearLeftDriveMotorPort = 2;
-    public static final int kFrontRightDriveMotorPort = 4;
-    public static final int kRearRightDriveMotorPort = 6;
+    public static final class Example {
+      public static final int kFrontLeftDriveMotorPort = 0;
+      public static final int kRearLeftDriveMotorPort = 2;
+      public static final int kFrontRightDriveMotorPort = 4;
+      public static final int kRearRightDriveMotorPort = 6;
 
-    public static final int kFrontLeftTurningMotorPort = 1;
-    public static final int kRearLeftTurningMotorPort = 3;
-    public static final int kFrontRightTurningMotorPort = 5;
-    public static final int kRearRightTurningMotorPort = 7;
+      public static final int kFrontLeftTurningMotorPort = 1;
+      public static final int kRearLeftTurningMotorPort = 3;
+      public static final int kFrontRightTurningMotorPort = 5;
+      public static final int kRearRightTurningMotorPort = 7;
 
-    public static final int[] kFrontLeftDriveEncoderPorts = new int[] {8, 9};
-    public static final int[] kRearLeftDriveEncoderPorts = new int[] {10, 11};
-    public static final int[] kFrontRightDriveEncoderPorts = new int[] {12, 13};
-    public static final int[] kRearRightDriveEncoderPorts = new int[] {14, 15};
+      public static final int[] kFrontLeftDriveEncoderPorts = new int[] {8, 9};
+      public static final int[] kRearLeftDriveEncoderPorts = new int[] {10, 11};
+      public static final int[] kFrontRightDriveEncoderPorts = new int[] {12, 13};
+      public static final int[] kRearRightDriveEncoderPorts = new int[] {14, 15};
+
+      public static final int[] kFrontLeftTurningEncoderPorts = new int[] {0, 1};
+      public static final int[] kRearLeftTurningEncoderPorts = new int[] {2, 3};
+      public static final int[] kFrontRightTurningEncoderPorts = new int[] {4, 5};
+      public static final int[] kRearRightTurningEncoderPorts = new int[] {6, 7};  
+    }
 
     public static final class CANCoder {
       // Below provided by SparkMAX motors API.
@@ -79,21 +86,16 @@ public final class Constants {
     public static final boolean kFrontRightDriveEncoderReversed = false;
     public static final boolean kRearRightDriveEncoderReversed = true;
 
-    public static final int[] kFrontLeftTurningEncoderPorts = new int[] {0, 1};
-    public static final int[] kRearLeftTurningEncoderPorts = new int[] {2, 3};
-    public static final int[] kFrontRightTurningEncoderPorts = new int[] {4, 5};
-    public static final int[] kRearRightTurningEncoderPorts = new int[] {6, 7};
-
     public static final boolean kFrontLeftTurningEncoderReversed = false;
     public static final boolean kRearLeftTurningEncoderReversed = true;
     public static final boolean kFrontRightTurningEncoderReversed = false;
     public static final boolean kRearRightTurningEncoderReversed = true;
 
-
-    public static final double kTrackWidth = 0.5;
+    // Units are meters.
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = 0.7;
+    public static final double kTrackWidth = 0.5;
     // Distance between front and back wheels on robot
+    public static final double kWheelBase = 0.7;
     public static final SwerveDriveKinematics kDriveKinematics =
         new SwerveDriveKinematics(
             new Translation2d(kWheelBase / 2, kTrackWidth / 2),
@@ -108,11 +110,12 @@ public final class Constants {
     // for *your* robot's drive.
     // The RobotPy Characterization Toolsuite provides a convenient tool for obtaining these
     // values for your robot.
-    public static final double ksVolts = 1;
+    /* I don't know if these are needed. They only appear here in the project. i.e. They are never used.
+    public static final double ksVolts = 1.0;
     public static final double kvVoltSecondsPerMeter = 0.8;
     public static final double kaVoltSecondsSquaredPerMeter = 0.15;
-
-    public static final double kMaxSpeedMetersPerSecond = 3;
+    */
+    public static final double kMaxSpeedMetersPerSecond = 3.0;
   }
 
   public static final class ModuleConstants {
@@ -134,9 +137,9 @@ public final class Constants {
         // Assumes the encoders are on a 1:1 reduction with the module shaft.
         (2 * Math.PI) / (double) kEncoderCPR;
 
-    public static final double kPModuleTurningController = 1;
+    public static final double kPModuleTurningController = 1.0;
 
-    public static final double kPModuleDriveController = 1;
+    public static final double kPModuleDriveController = 1.0;
   }
 
   public static final class OIConstants {
@@ -144,14 +147,14 @@ public final class Constants {
   }
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 3;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+    public static final double kMaxSpeedMetersPerSecond = 3.0;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 3.0;
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
-    public static final double kPXController = 1;
-    public static final double kPYController = 1;
-    public static final double kPThetaController = 1;
+    public static final double kPXController = 1.0;
+    public static final double kPYController = 1.0;
+    public static final double kPThetaController = 1.0;
 
     // Constraint for the motion profilied robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
