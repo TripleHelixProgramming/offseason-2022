@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
@@ -14,7 +15,7 @@ import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import com.ctre.phoenix.sensors.PigeonIMU;
+// import com.ctre.phoenix.sensors.PigeonIMU;
 
 @SuppressWarnings("PMD.ExcessiveImports")
 public class DriveSubsystem extends SubsystemBase {
@@ -56,13 +57,9 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kRearRightTurningEncoderReversed);
 
   // The gyro sensor
-  private final Gyro m_gyro = null;
+  private final Gyro m_gyro = new ADXRS450_Gyro();
   
-  private final PigeonIMU m_pigeon = new PigeonIMU(DriveConstants.kPigeonPort);
-
-
   // Odometry class for tracking robot pose
-  
   SwerveDriveOdometry m_odometry;  
 
   /** Creates a new DriveSubsystem. */
@@ -146,8 +143,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    // m_gyro.reset();
-    m_pigeon.setYaw(0.0);
+    m_gyro.reset();
   }
 
   /**
@@ -156,10 +152,10 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading as a Rotation2d
    */
   public Rotation2d getHeading() {
-    // return m_gyro.getRotation2d().getDegrees();
-    double[] ypr_deg = {0.0, 0.0, 0.0};
-    m_pigeon.getYawPitchRoll(ypr_deg);
-    return new Rotation2d(Math.toRadians(ypr_deg[0]));
+    return m_gyro.getRotation2d();
+    // double[] ypr_deg = {0.0, 0.0, 0.0};
+    // m_pigeon.getYawPitchRoll(ypr_deg);
+    // return new Rotation2d(Math.toRadians(ypr_deg[0]));
   }
 
   /**
@@ -167,7 +163,7 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @return The turn rate of the robot, in degrees per second
    */
-  // public double getTurnRate() {
-  //   return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
-  // }
+  public double getTurnRate() {
+    return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  }
 }

@@ -13,7 +13,10 @@ import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import com.ctre.phoenix.sensors.PigeonIMU;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
+
+// import com.ctre.phoenix.sensors.PigeonIMU;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -53,7 +56,8 @@ public class SparkDriveSubsystem extends SubsystemBase {
           DriveConstants.kRearRightTurningEncoderReversed);
 
   // The gyro sensor
-  private final PigeonIMU m_pigeon = new PigeonIMU(DriveConstants.kPigeonPort);
+  private final Gyro m_gyro = new ADXRS450_Gyro();
+  // private final PigeonIMU m_pigeon = new PigeonIMU(DriveConstants.kPigeonPort);
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry;
@@ -154,8 +158,8 @@ public class SparkDriveSubsystem extends SubsystemBase {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-//    m_gyro.reset();
-    m_pigeon.setYaw(0.0);
+    m_gyro.reset();
+//    m_pigeon.setYaw(0.0);
   }
 
   /**
@@ -164,9 +168,10 @@ public class SparkDriveSubsystem extends SubsystemBase {
    * @return the robot's heading as a Rotation2d
    */
   public Rotation2d getHeading() {
-    double[] ypr_deg = {0.0, 0.0, 0.0};
-    m_pigeon.getYawPitchRoll(ypr_deg);
-    return new Rotation2d(Math.toRadians(ypr_deg[0]));
+    return m_gyro.getRotation2d();
+    // double[] ypr_deg = {0.0, 0.0, 0.0};
+    // m_pigeon.getYawPitchRoll(ypr_deg);
+    // return new Rotation2d(Math.toRadians(ypr_deg[0]));
   }
 
 
@@ -175,7 +180,7 @@ public class SparkDriveSubsystem extends SubsystemBase {
    *
    * @return The turn rate of the robot, in degrees per second
    */
-  // public double getTurnRate() {
-  //   return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
-  // }
+  public double getTurnRate() {
+    return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  }
 }
