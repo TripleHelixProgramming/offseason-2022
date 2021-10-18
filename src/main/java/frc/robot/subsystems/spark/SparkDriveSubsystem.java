@@ -91,6 +91,18 @@ public class SparkDriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("RearRight Velocity", m_rearRight.getState().speedMetersPerSecond);
     SmartDashboard.putNumber("RearRight Angle", m_rearRight.getState().angle.getDegrees());
 
+    SmartDashboard.putNumber("FronLeft Turning Encoder Position", m_frontLeft.getTurnEncoder().getPosition() );
+    SmartDashboard.putNumber("FronLeft Turning Encoder Velocity", m_frontLeft.getTurnEncoder().getVelocity() );
+
+    SmartDashboard.putNumber("FronLeft Turning Motor Position", m_frontLeft.getTurnMotor().getEncoder().getPosition());
+    SmartDashboard.putNumber("FronLeft Turning Motor Velocity", m_frontLeft.getTurnMotor().getEncoder().getVelocity());
+    
+    SmartDashboard.putNumber("FronLeft Turning CANcoder Position", m_frontLeft.getTurnCANcoder().getPosition() );
+    SmartDashboard.putNumber("FronLeft Turning CANcoder Mag Offset", m_frontLeft.getTurnCANcoder().configGetMagnetOffset() );
+
+    SmartDashboard.putNumber("FronLeft Turning CANcoder Abs Position", m_frontLeft.getTurnCANcoder().getAbsolutePosition() );
+    SmartDashboard.putNumber("FronLeft Turning CANcoder Velocity", m_frontLeft.getTurnCANcoder().getVelocity() );
+
   }
 
   /**

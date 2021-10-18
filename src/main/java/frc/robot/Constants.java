@@ -129,6 +129,10 @@ public final class Constants {
     // to make it report in meters per second.
     public static final double kDriveVelocityConversionFactor = (kWheelDiameterMeters * Math.PI) / 60.0;
 
+
+    public static final double kTurnPositionConversionFactor = 12.8;
+
+
     public static final double kDriveEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
         (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
@@ -143,7 +147,7 @@ public final class Constants {
   }
 
   public static final class OIConstants {
-    public static final int kDriverControllerPort = 1;
+    public static final int kDriverControllerPort = 0;
   }
 
   public static final class AutoConstants {

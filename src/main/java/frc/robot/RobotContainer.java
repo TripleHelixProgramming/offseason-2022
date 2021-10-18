@@ -21,9 +21,14 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -39,23 +44,33 @@ public class RobotContainer {
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  JoystickButton xButton = new JoystickButton(m_driverController, 3);
+
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
 
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
-    m_robotDrive.setDefaultCommand(
+    m_robotDrive.setDefaultCommand(new Command() {
+      @Override
+      public Set<Subsystem> getRequirements() {
+        return Set.of(m_robotDrive);
+      }
+    });
         // A split-stick arcade command, with forward/backward controlled by the left
         // hand, and turning controlled by the right.
-        new RunCommand(
+/*        new RunCommand(
             () ->
                 m_robotDrive.drive(
                     m_driverController.getY(GenericHID.Hand.kLeft),
                     m_driverController.getX(GenericHID.Hand.kRight),
                     m_driverController.getX(GenericHID.Hand.kLeft),
                     false), m_robotDrive));
+*/                    
   }
 
   /**
@@ -64,7 +79,11 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling passing it to a
    * {@link JoystickButton}.
    */
-  private void configureButtonBindings() {}
+  private void configureButtonBindings() {
+    xButton.whenPressed(() -> {
+      m_robotDrive.resetEncoders();
+    });
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

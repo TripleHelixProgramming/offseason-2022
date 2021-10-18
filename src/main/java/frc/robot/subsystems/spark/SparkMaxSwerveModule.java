@@ -23,7 +23,8 @@ public class SparkMaxSwerveModule {
   private final CANSparkMax m_turningMotor;
 
   private final CANEncoder m_driveEncoder;
-  private final CANCoder m_turningEncoder;
+  private final CANCoder m_turningCANcoder;
+  private final CANEncoder m_turningEncoder;
 
   private final PIDController m_drivePIDController =
       new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
@@ -58,7 +59,10 @@ public class SparkMaxSwerveModule {
     this.m_driveEncoder = m_driveMotor.getEncoder();
 
 //    this.m_turningEncoder = new Encoder(turningEncoderPorts[0], turningEncoderPorts[1]);
-    this.m_turningEncoder = new CANCoder(turningEncoderPort);
+    this.m_turningCANcoder = new CANCoder(turningEncoderPort);
+    this.m_turningEncoder = m_turningMotor.getEncoder();
+
+    m_turningEncoder.setPositionConversionFactor(1.0/ModuleConstants.kTurnPositionConversionFactor);
 
     // Set the distance per pulse for the drive encoder. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
@@ -79,7 +83,7 @@ public class SparkMaxSwerveModule {
 // I do not believe this is required for the CANEncoder. .getPosition() returns angle in degrees.
 
     // Set whether turning encoder should be reversed or not
-    m_turningEncoder.configSensorDirection(turningEncoderReversed);
+//    m_turningEncoder.configSensorDirection(turningEncoderReversed);
 
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.
@@ -92,8 +96,26 @@ public class SparkMaxSwerveModule {
    * @return The current state of the module.
    */
   public SwerveModuleState getState() {
-    return new SwerveModuleState(m_driveEncoder.getVelocity(), new Rotation2d(Math.toRadians(m_turningEncoder.getPosition())));
+    double m1 = m_turningEncoder.getPosition() % 1.0;
+    double m2 = m1 < 0 ? m1 + 1 : m1;
+    return new SwerveModuleState(m_driveEncoder.getVelocity(), new Rotation2d(m2 * 2 * Math.PI));
   }
+
+  public CANSparkMax getTurnMotor() {
+      return m_turningMotor;
+  }
+
+  public CANEncoder getTurnEncoder() {
+      return m_turningEncoder;
+  }
+
+  public CANCoder getTurnCANcoder() {
+      return m_turningCANcoder;
+  }
+
+  public double getTurnCANcoderAngle() {
+    return m_turningCANcoder.getAbsolutePosition();
+}
 
   /**
    * Sets the desired state for the module.
@@ -118,5 +140,8 @@ public class SparkMaxSwerveModule {
   public void resetEncoders() {
     m_driveEncoder.setPosition(0.0);
     m_turningEncoder.setPosition(0.0);
+
+    m_turningCANcoder.setPosition(0.0);
+    m_turningCANcoder.configMagnetOffset(-m_turningCANcoder.getAbsolutePosition());
   }
 }
