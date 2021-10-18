@@ -28,32 +28,32 @@ public class SparkDriveSubsystem extends SubsystemBase {
           DriveConstants.SparkCAN.kFrontLeftDriveMotorPort,
           DriveConstants.SparkCAN.kFrontLeftTurningMotorPort,
           DriveConstants.CANCoder.kFrontLefTurningEncoderPort,
-          DriveConstants.kFrontLeftDriveEncoderReversed,
-          DriveConstants.kFrontLeftTurningEncoderReversed);
+          DriveConstants.CANCoder.kFrontLefTurningEncoderOffset
+          );
 
   private final SparkMaxSwerveModule m_rearLeft =
       new SparkMaxSwerveModule(
           DriveConstants.SparkCAN.kRearLeftDriveMotorPort,
           DriveConstants.SparkCAN.kRearLeftTurningMotorPort,
           DriveConstants.CANCoder.kRearLeftTurningEncoderPort,
-          DriveConstants.kRearLeftDriveEncoderReversed,
-          DriveConstants.kRearLeftTurningEncoderReversed);
+          DriveConstants.CANCoder.kRearLeftTurningEncoderOffset
+          );
 
   private final SparkMaxSwerveModule m_frontRight =
       new SparkMaxSwerveModule(
           DriveConstants.SparkCAN.kFrontRightDriveMotorPort,
           DriveConstants.SparkCAN.kFrontRightTurningMotorPort,
           DriveConstants.CANCoder.kFrontRightTurningEncoderPort,
-          DriveConstants.kFrontRightDriveEncoderReversed,
-          DriveConstants.kFrontRightTurningEncoderReversed);
+          DriveConstants.CANCoder.kFrontRightTurningEncoderOffset
+          );
 
   private final SparkMaxSwerveModule m_rearRight =
       new SparkMaxSwerveModule(
           DriveConstants.SparkCAN.kRearRightDriveMotorPort,
           DriveConstants.SparkCAN.kRearRightTurningMotorPort,
           DriveConstants.CANCoder.kRearRightTurningEncoderPort,
-          DriveConstants.kRearRightDriveEncoderReversed,
-          DriveConstants.kRearRightTurningEncoderReversed);
+          DriveConstants.CANCoder.kRearRightTurningEncoderOffset
+          );
 
   // The gyro sensor
   private final Gyro m_gyro = new ADXRS450_Gyro();
@@ -98,10 +98,10 @@ public class SparkDriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("FronLeft Turning Motor Velocity", m_frontLeft.getTurnMotor().getEncoder().getVelocity());
     
     SmartDashboard.putNumber("FronLeft Turning CANcoder Position", m_frontLeft.getTurnCANcoder().getPosition() );
-    SmartDashboard.putNumber("FronLeft Turning CANcoder Mag Offset", m_frontLeft.getTurnCANcoder().configGetMagnetOffset() );
-
-    SmartDashboard.putNumber("FronLeft Turning CANcoder Abs Position", m_frontLeft.getTurnCANcoder().getAbsolutePosition() );
     SmartDashboard.putNumber("FronLeft Turning CANcoder Velocity", m_frontLeft.getTurnCANcoder().getVelocity() );
+
+    SmartDashboard.putNumber("FronLeft Turning CANcoder Mag Offset", m_frontLeft.getTurnCANcoder().configGetMagnetOffset() );
+    SmartDashboard.putNumber("FronLeft Turning CANcoder Abs Position", m_frontLeft.getTurnCANcoder().getAbsolutePosition() );
 
   }
 

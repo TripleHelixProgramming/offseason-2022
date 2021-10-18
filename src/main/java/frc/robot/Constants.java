@@ -79,6 +79,12 @@ public final class Constants {
       public static final int kFrontLefTurningEncoderPort = 43;
       public static final int kRearLeftTurningEncoderPort = 45;
 
+      public static final double kRearRightTurningEncoderOffset = 180.0;
+      public static final double kFrontRightTurningEncoderOffset = 180.0;
+      public static final double kFrontLefTurningEncoderOffset = 180.0;
+      public static final double kRearLeftTurningEncoderOffset = 180.0;
+
+
     }
 
     public static final boolean kFrontLeftDriveEncoderReversed = false;
@@ -119,6 +125,15 @@ public final class Constants {
   }
 
   public static final class ModuleConstants {
+
+    public static final double kDriveP = 1.0;
+    public static final double kDriveI = 0.0;
+    public static final double kDriveD = 0.5;
+
+    public static final double kTurningP = 1.0;
+    public static final double kTurningI = 0.0;
+    public static final double kTurningD = 0.5;
+    
     public static final double kMaxModuleAngularSpeedRadiansPerSecond = 2 * Math.PI;
     public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 2 * Math.PI;
 
