@@ -16,6 +16,7 @@ import frc.robot.subsystems.spark.SparkDriveSubsystem;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
@@ -54,23 +55,12 @@ public class RobotContainer {
     configureButtonBindings();
 
     // Configure default commands
-    // Set the default drive command to split-stick arcade drive
-    m_robotDrive.setDefaultCommand(new Command() {
-      @Override
-      public Set<Subsystem> getRequirements() {
-        return Set.of(m_robotDrive);
-      }
-    });
-        // A split-stick arcade command, with forward/backward controlled by the left
-        // hand, and turning controlled by the right.
-/*        new RunCommand(
-            () ->
-                m_robotDrive.drive(
-                    m_driverController.getY(GenericHID.Hand.kLeft),
-                    m_driverController.getX(GenericHID.Hand.kRight),
-                    m_driverController.getX(GenericHID.Hand.kLeft),
-                    false), m_robotDrive));
-*/                    
+
+    m_robotDrive.setDefaultCommand(new RunCommand(() -> m_robotDrive.setModuleStates(new SwerveModuleState[]{
+      new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight), new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft))),
+      new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight), new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft))),
+      new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight), new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft))),
+      new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight), new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft)))}), m_robotDrive));
   }
 
   /**

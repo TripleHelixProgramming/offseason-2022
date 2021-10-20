@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.util.Units;
 
@@ -62,6 +63,7 @@ public class SparkMaxSwerveModule {
         m_turningEncoder = m_turningMotor.getEncoder();
 
         m_turningCANCoder = new CANCoder(turningCANCoderChannel);
+        m_turningCANCoder.setPosition(0);
         m_turningCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
         m_CANCoderOffset = Rotation2d.fromDegrees(turningCANCoderOffsetDegrees);
 
@@ -75,7 +77,7 @@ public class SparkMaxSwerveModule {
 
         // Limit the PID Controller's input range between -pi and pi and set the input
         // to be continuous.
-        m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
+        // m_turningPIDController.enableContinuousInput(0, 360);
 
     }
 
@@ -117,11 +119,21 @@ public class SparkMaxSwerveModule {
      */
     public void setDesiredState(SwerveModuleState state) {
         // Calculate the drive output from the drive PID controller.
-        final var driveOutput = m_drivePIDController.calculate(m_driveMotor.get(), state.speedMetersPerSecond);
+        final var driveOutput = state.speedMetersPerSecond * 0.1 /*m_drivePIDController.calculate(m_driveEncoder.getVelocity(), state.speedMetersPerSecond)*/;
 
         // Calculate the turning motor output from the turning PID controller.
-        final var turnOutput = m_turningPIDController.calculate(m_turningEncoder.getVelocity(),
-                state.angle.getDegrees());
+        // final var turnOutput = m_turningPIDController.calculate(m_turningCANCoder.getAbsolutePosition(),
+        //         state.angle.getDegrees());
+
+        SmartDashboard.putNumber("target", state.angle.getDegrees());
+        SmartDashboard.putNumber("pos", m_turningCANCoder.getPosition());
+
+        double error = m_turningCANCoder.getAbsolutePosition() - state.angle.getDegrees();
+        double m01 = ((error + 180) % (360)) - 180;
+        double m02 = m01 < -180 ? m01 + 360 : m01;
+
+
+        final var turnOutput = -0.01 * m02;
 
         // Calculate the turning motor output from the turning PID controller.
         m_driveMotor.set(driveOutput);
@@ -140,6 +152,7 @@ public class SparkMaxSwerveModule {
 
         
         m_turningCANCoder.setPosition(0.0);
-        m_turningCANCoder.configMagnetOffset(-m_turningCANCoder.getAbsolutePosition());
+        double curAbsPosition =-m_turningCANCoder.getAbsolutePosition();
+        m_turningCANCoder.configMagnetOffset(m_turningCANCoder.configGetMagnetOffset()+curAbsPosition);
     }
 }

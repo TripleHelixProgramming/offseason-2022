@@ -77,32 +77,24 @@ public class SparkDriveSubsystem extends SubsystemBase {
         m_frontRight.getState(),
         m_rearRight.getState());
 
+    SparkMaxSwerveModule[] modules = {m_frontLeft, m_frontRight, m_rearLeft, m_rearRight};
+    
     SmartDashboard.putNumber("Heading", getHeading().getDegrees());
 
-    SmartDashboard.putNumber("FrontLeft Velocity", m_frontLeft.getState().speedMetersPerSecond);
-    SmartDashboard.putNumber("FrontLeft Angle", m_frontLeft.getState().angle.getDegrees());
+    SmartDashboard.putNumber("FrontLeft State Velocity", modules[0].getState().speedMetersPerSecond);
+    SmartDashboard.putNumber("FrontLeft State Angle", modules[0].getState().angle.getDegrees());
 
-    SmartDashboard.putNumber("FrontRight Velocity", m_frontRight.getState().speedMetersPerSecond);
-    SmartDashboard.putNumber("FrontRight Angle", m_frontRight.getState().angle.getDegrees());
+    SmartDashboard.putNumber("FrontRight Velocity", modules[1].getState().speedMetersPerSecond);
+    SmartDashboard.putNumber("FrontRight Angle", modules[1].getState().angle.getDegrees());
 
-    SmartDashboard.putNumber("RearLeft Velocity", m_rearLeft.getState().speedMetersPerSecond);
-    SmartDashboard.putNumber("RearLeft Angle", m_rearLeft.getState().angle.getDegrees());
+    SmartDashboard.putNumber("RearLeft Velocity", modules[2].getState().speedMetersPerSecond);
+    SmartDashboard.putNumber("RearLeft Angle", modules[2].getState().angle.getDegrees());
 
-    SmartDashboard.putNumber("RearRight Velocity", m_rearRight.getState().speedMetersPerSecond);
-    SmartDashboard.putNumber("RearRight Angle", m_rearRight.getState().angle.getDegrees());
+    SmartDashboard.putNumber("RearRight Velocity", modules[3].getState().speedMetersPerSecond);
+    SmartDashboard.putNumber("RearRight Angle", modules[3].getState().angle.getDegrees());
 
-    SmartDashboard.putNumber("FronLeft Turning Encoder Position", m_frontLeft.getTurnEncoder().getPosition() );
-    SmartDashboard.putNumber("FronLeft Turning Encoder Velocity", m_frontLeft.getTurnEncoder().getVelocity() );
-
-    SmartDashboard.putNumber("FronLeft Turning Motor Position", m_frontLeft.getTurnMotor().getEncoder().getPosition());
-    SmartDashboard.putNumber("FronLeft Turning Motor Velocity", m_frontLeft.getTurnMotor().getEncoder().getVelocity());
-    
-    SmartDashboard.putNumber("FronLeft Turning CANcoder Position", m_frontLeft.getTurnCANcoder().getPosition() );
-    SmartDashboard.putNumber("FronLeft Turning CANcoder Velocity", m_frontLeft.getTurnCANcoder().getVelocity() );
-
-    SmartDashboard.putNumber("FronLeft Turning CANcoder Mag Offset", m_frontLeft.getTurnCANcoder().configGetMagnetOffset() );
-    SmartDashboard.putNumber("FronLeft Turning CANcoder Abs Position", m_frontLeft.getTurnCANcoder().getAbsolutePosition() );
-
+    SmartDashboard.putNumber("FronLeft Turning CANcoder Mag Offset", modules[0].getTurnCANcoder().configGetMagnetOffset());
+    SmartDashboard.putNumber("FronLeft Turning CANcoder Abs Position", modules[0].getTurnCANcoder().getAbsolutePosition());
   }
 
   /**

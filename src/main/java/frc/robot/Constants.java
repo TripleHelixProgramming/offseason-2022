@@ -130,12 +130,12 @@ public final class Constants {
     public static final double kDriveI = 0.0;
     public static final double kDriveD = 0.5;
 
-    public static final double kTurningP = 1.0;
+    public static final double kTurningP = 0.005;
     public static final double kTurningI = 0.0;
-    public static final double kTurningD = 0.5;
+    public static final double kTurningD = 0.0;
     
-    public static final double kMaxModuleAngularSpeedRadiansPerSecond = 2 * Math.PI;
-    public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 2 * Math.PI;
+    public static final double kMaxModuleAngularSpeedRadiansPerSecond = 0.000005 * Math.PI;
+    public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 0.000005 * Math.PI;
 
     public static final int kEncoderCPR = 1024;
     public static final double kWheelDiameterMeters = 0.09398; // 3.7 in
