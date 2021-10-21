@@ -4,7 +4,15 @@
 
 package frc.robot.subsystems.spark;
 
-import frc.robot.Constants.ModuleConstants;
+import com.ctre.phoenix.sensors.AbsoluteSensorRange;
+import com.ctre.phoenix.sensors.CANCoder;
+
+import com.revrobotics.CANEncoder;
+import com.revrobotics.CANPIDController;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.ControlType;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
@@ -12,19 +20,11 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.util.Units;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.ModuleConstants;
 
-import com.ctre.phoenix.sensors.AbsoluteSensorRange;
-import com.ctre.phoenix.sensors.CANCoder;
-
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANPIDController;
-import com.revrobotics.ControlType;
-import com.revrobotics.CANSparkMax.IdleMode;
-
-public class SparkMaxSwerveModule {
+public class SparkMaxSwerveModule extends SubsystemBase {
 
     private final CANSparkMax m_driveMotor;
     private final CANSparkMax m_turningMotor;
@@ -38,14 +38,17 @@ public class SparkMaxSwerveModule {
     // robot is turned on
     private final Rotation2d m_CANCoderOffset;
 
-    private final PIDController m_drivePIDController = new PIDController(ModuleConstants.kDriveP,
-            ModuleConstants.kDriveI, ModuleConstants.kDriveD);
+    private final CANPIDController m_turningController;
+    private final CANPIDController m_driveController;
 
-    // Using a TrapezoidProfile PIDController to allow for smooth turning
-    private final ProfiledPIDController m_turningPIDController = new ProfiledPIDController(ModuleConstants.kTurningP,
-            ModuleConstants.kTurningI, ModuleConstants.kTurningD,
-            new TrapezoidProfile.Constraints(ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
-                    ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
+    // private final PIDController m_drivePIDController = new PIDController(ModuleConstants.kDriveP,
+    //         ModuleConstants.kDriveI, ModuleConstants.kDriveD);
+
+    // // Using a TrapezoidProfile PIDController to allow for smooth turning
+    // private final ProfiledPIDController m_turningPIDController = new ProfiledPIDController(ModuleConstants.kTurningP,
+    //         ModuleConstants.kTurningI, ModuleConstants.kTurningD,
+    //         new TrapezoidProfile.Constraints(ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
+    //                 ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
 
     /**
      * Constructs a SwerveModule.
@@ -53,8 +56,11 @@ public class SparkMaxSwerveModule {
      * @param driveMotorChannel   ID for the drive motor.
      * @param turningMotorChannel ID for the turning motor.
      */
-    public SparkMaxSwerveModule(int driveMotorChannel, int turningMotorChannel, int turningCANCoderChannel,
-            double turningCANCoderOffsetDegrees) {
+    public SparkMaxSwerveModule(
+                        int driveMotorChannel,
+                        int turningMotorChannel,
+                        int turningCANCoderChannel,
+                        double turningCANCoderOffsetDegrees) {
 
         m_driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
         m_turningMotor = new CANSparkMax(turningMotorChannel, MotorType.kBrushless);
@@ -72,12 +78,27 @@ public class SparkMaxSwerveModule {
 
         // m_driveEncoder returns RPM by default. Use setVelocityConversionFactor() to
         // convert that to meters per second.
-        m_driveEncoder.setVelocityConversionFactor(ModuleConstants.kDriveVelocityConversionFactor);
+        m_driveEncoder.setVelocityConversionFactor(ModuleConstants.kDriveConversionFactor / 60.0);
+        m_driveEncoder.setPositionConversionFactor(ModuleConstants.kDriveConversionFactor);
+
         m_turningEncoder.setPositionConversionFactor(1.0 / ModuleConstants.kTurnPositionConversionFactor);
 
         // Limit the PID Controller's input range between -pi and pi and set the input
         // to be continuous.
         // m_turningPIDController.enableContinuousInput(0, 360);
+
+        m_turningController = m_turningMotor.getPIDController();
+        m_driveController = m_driveMotor.getPIDController();
+
+        m_turningController.setP(Constants.ModuleConstants.kTurningP);
+        // m_turningController.setI(Constants.ModuleConstants.kTurningI);
+        m_turningController.setD(Constants.ModuleConstants.kTurningD);
+
+        // 401 only sets P of the drive PID
+        m_driveController.setP(Constants.ModuleConstants.kDriveP);
+        // m_driveController.setI(Constants.ModuleConstants.kDriveI);
+        // m_driveController.setD(Constants.ModuleConstants.kDriveD);
+
 
     }
 
@@ -132,27 +153,52 @@ public class SparkMaxSwerveModule {
         double m01 = ((error + 180) % (360)) - 180;
         double m02 = m01 < -180 ? m01 + 360 : m01;
 
-
         final var turnOutput = -0.01 * m02;
 
-        // Calculate the turning motor output from the turning PID controller.
-        m_driveMotor.set(driveOutput);
-        m_turningMotor.set(turnOutput);
+        m_turningController.setReference(
+            turnOutput,
+            ControlType.kPosition
+        );        
+        // m_turningMotor.set(turnOutput);
+
+        // Calculate the drive motor output from the drive PID controller.
+        double speedRadPerSec = driveOutput / (Constants.ModuleConstants.kWheelDiameterMeters / 2);
+
+        m_driveController.setReference(driveOutput, ControlType.kVelocity, 0,  
+            Constants.ModuleConstants.driveFF.calculate(speedRadPerSec));
+        // m_driveMotor.set(driveOutput);
+    }
+
+    //calculate the angle motor setpoint based on the desired angle and the current angle measurement
+    public double calculateAdjustedAngle(double targetAngle, double currentAngle) {
+
+        double modAngle = currentAngle % (2.0 * Math.PI);
+
+        if (modAngle < 0.0) modAngle += 2.0 * Math.PI;
+        
+        double newTarget = targetAngle + currentAngle - modAngle;
+
+        if (targetAngle - modAngle > Math.PI) newTarget -= 2.0 * Math.PI;
+        else if (targetAngle - modAngle < -Math.PI) newTarget += 2.0 * Math.PI;
+
+        return newTarget;
+
     }
 
     public double getDriveDistanceMeters() {
         return m_driveEncoder.getPosition();
     }
 
+    public void resetDistance() {
+        m_driveEncoder.setPosition(0.0);
+    }
+
     /** Zeros all the SwerveModule encoders. */
     public void resetEncoders() {
         // Reset the cumulative rotation counts of the SparkMax motors
-        m_driveEncoder.setPosition(0.0);
         m_turningEncoder.setPosition(0.0);
 
-        
         m_turningCANCoder.setPosition(0.0);
-        double curAbsPosition =-m_turningCANCoder.getAbsolutePosition();
-        m_turningCANCoder.configMagnetOffset(m_turningCANCoder.configGetMagnetOffset()+curAbsPosition);
+        m_turningCANCoder.configMagnetOffset(m_turningCANCoder.configGetMagnetOffset() - m_turningCANCoder.getAbsolutePosition());
     }
 }

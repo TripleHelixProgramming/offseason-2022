@@ -60,7 +60,8 @@ public class RobotContainer {
       new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight), new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft))),
       new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight), new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft))),
       new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight), new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft))),
-      new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight), new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft)))}), m_robotDrive));
+      new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight), new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft)))}),
+      m_robotDrive));
   }
 
   /**

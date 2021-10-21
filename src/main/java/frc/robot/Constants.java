@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
@@ -17,7 +18,11 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+
   public static final class DriveConstants {
+
+    // Define the conventional order of our modules when putting them into arrays
+    public enum DriveModules { FrontLeft, FrontRight, RearLeft, RearRight};
 
     public static final int kPigeonPort = 20;
 
@@ -84,30 +89,35 @@ public final class Constants {
       public static final double kFrontLefTurningEncoderOffset = 180.0;
       public static final double kRearLeftTurningEncoderOffset = 180.0;
 
-
     }
 
     public static final boolean kFrontLeftDriveEncoderReversed = false;
-    public static final boolean kRearLeftDriveEncoderReversed = true;
     public static final boolean kFrontRightDriveEncoderReversed = false;
+    public static final boolean kRearLeftDriveEncoderReversed = true;
     public static final boolean kRearRightDriveEncoderReversed = true;
 
     public static final boolean kFrontLeftTurningEncoderReversed = false;
-    public static final boolean kRearLeftTurningEncoderReversed = true;
     public static final boolean kFrontRightTurningEncoderReversed = false;
+    public static final boolean kRearLeftTurningEncoderReversed = true;
     public static final boolean kRearRightTurningEncoderReversed = true;
 
     // Units are meters.
     // Distance between centers of right and left wheels on robot
     public static final double kTrackWidth = 0.5715; // 22.5 in
+    
     // Distance between front and back wheels on robot
     public static final double kWheelBase = 0.6223; // 24.5 in
+
+    //The locations for the modules must be relative to the center of the robot. 
+    // Positive x values represent moving toward the front of the robot 
+    // Positive y values represent moving toward the left of the robot.
     public static final SwerveDriveKinematics kDriveKinematics =
         new SwerveDriveKinematics(
-            new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-            new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-            new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-            new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+            new Translation2d(kWheelBase / 2.0, kTrackWidth / 2.0),   // front left
+            new Translation2d(kWheelBase / 2.0, -kTrackWidth / 2.0),  // front right
+            new Translation2d(-kWheelBase / 2.0, kTrackWidth / 2.0),  // rear left
+            new Translation2d(-kWheelBase / 2.0, -kTrackWidth / 2.0)  // rear right
+            );
 
     public static final boolean kGyroReversed = false;
 
@@ -126,39 +136,27 @@ public final class Constants {
 
   public static final class ModuleConstants {
 
-    public static final double kDriveP = 1.0;
+    public static final double kDriveP = 0.01;
     public static final double kDriveI = 0.0;
-    public static final double kDriveD = 0.5;
+    public static final double kDriveD = 0.1;
 
     public static final double kTurningP = 0.005;
     public static final double kTurningI = 0.0;
-    public static final double kTurningD = 0.0;
+    public static final double kTurningD = 0.1;
     
     public static final double kMaxModuleAngularSpeedRadiansPerSecond = 0.000005 * Math.PI;
     public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 0.000005 * Math.PI;
 
-    public static final int kEncoderCPR = 1024;
+    public static final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(0.254, 0.137);
+    
     public static final double kWheelDiameterMeters = 0.09398; // 3.7 in
 
     // The drive encoder reports in RPM by default. Calculate the conversion factor
     // to make it report in meters per second.
-    public static final double kDriveVelocityConversionFactor = (kWheelDiameterMeters * Math.PI) / 60.0;
-
+    public static final double kDriveConversionFactor = (kWheelDiameterMeters * Math.PI);
 
     public static final double kTurnPositionConversionFactor = 12.8;
 
-
-    public static final double kDriveEncoderDistancePerPulse =
-        // Assumes the encoders are directly mounted on the wheel shafts
-        (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
-
-    public static final double kTurningEncoderDistancePerPulse =
-        // Assumes the encoders are on a 1:1 reduction with the module shaft.
-        (2 * Math.PI) / (double) kEncoderCPR;
-
-    public static final double kPModuleTurningController = 1.0;
-
-    public static final double kPModuleDriveController = 1.0;
   }
 
   public static final class OIConstants {
