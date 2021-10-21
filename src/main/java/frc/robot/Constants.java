@@ -153,9 +153,20 @@ public final class Constants {
 
     // The drive encoder reports in RPM by default. Calculate the conversion factor
     // to make it report in meters per second.
-    public static final double kDriveConversionFactor = (kWheelDiameterMeters * Math.PI);
+    public static final double kDriveGearRatio = 6.75;
+    public static final double kDriveConversionFactor = (kWheelDiameterMeters * Math.PI) / kDriveGearRatio;
 
     public static final double kTurnPositionConversionFactor = 12.8;
+
+    public static final int kEncoderCPR = 1024;
+
+    public static final double kDriveEncoderDistancePerPulse =
+    // Assumes the encoders are directly mounted on the wheel shafts
+    (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
+
+    public static final double kTurningEncoderDistancePerPulse =
+    // Assumes the encoders are on a 1:1 reduction with the module shaft.
+    (2 * Math.PI) / (double) kEncoderCPR;
 
   }
 

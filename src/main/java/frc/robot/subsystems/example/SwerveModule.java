@@ -21,12 +21,12 @@ public class SwerveModule {
   private final Encoder m_turningEncoder;
 
   private final PIDController m_drivePIDController =
-      new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
+      new PIDController(ModuleConstants.kDriveP, 0, 0);
 
   // Using a TrapezoidProfile PIDController to allow for smooth turning
   private final ProfiledPIDController m_turningPIDController =
       new ProfiledPIDController(
-          ModuleConstants.kPModuleTurningController,
+          ModuleConstants.kTurningP,
           0,
           0,
           new TrapezoidProfile.Constraints(
@@ -55,7 +55,7 @@ public class SwerveModule {
 
     // Set the distance per pulse for the drive encoder. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
-    // resolution.
+    // resolution
     m_driveEncoder.setDistancePerPulse(ModuleConstants.kDriveEncoderDistancePerPulse);
 
     // Set whether drive encoder should be reversed or not

@@ -69,8 +69,8 @@ public class SparkMaxSwerveModule extends SubsystemBase {
         m_turningEncoder = m_turningMotor.getEncoder();
 
         m_turningCANCoder = new CANCoder(turningCANCoderChannel);
-        m_turningCANCoder.setPosition(0);
         m_turningCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+        m_turningCANCoder.setPosition(0);
         m_CANCoderOffset = Rotation2d.fromDegrees(turningCANCoderOffsetDegrees);
 
         m_driveMotor.setIdleMode(IdleMode.kBrake);
@@ -139,40 +139,36 @@ public class SparkMaxSwerveModule extends SubsystemBase {
      *              degrees).
      */
     public void setDesiredState(SwerveModuleState state) {
-        // Calculate the drive output from the drive PID controller.
-        final var driveOutput = state.speedMetersPerSecond * 0.1 /*m_drivePIDController.calculate(m_driveEncoder.getVelocity(), state.speedMetersPerSecond)*/;
 
-        // Calculate the turning motor output from the turning PID controller.
-        // final var turnOutput = m_turningPIDController.calculate(m_turningCANCoder.getAbsolutePosition(),
-        //         state.angle.getDegrees());
+        Rotation2d curAngle = Rotation2d.fromDegrees(m_turningCANCoder.getAbsolutePosition());
 
         SmartDashboard.putNumber("target angle", state.angle.getDegrees());
-        SmartDashboard.putNumber("current angle", m_turningCANCoder.getPosition());
+        SmartDashboard.putNumber("current angle", curAngle.getDegrees());
 
-        double error = m_turningCANCoder.getAbsolutePosition() - state.angle.getDegrees();
+        double error = curAngle.getDegrees() - state.angle.getDegrees();
         double m01 = ((error + 180) % (360)) - 180;
         double m02 = m01 < -180 ? m01 + 360 : m01;
 
         final var turnOutput = -0.01 * m02;
 
-        Rotation2d curAngle = Rotation2d.fromDegrees(m_turningCANCoder.getPosition());
-        
         Rotation2d adjustedAngle = new Rotation2d(calculateAdjustedAngle(state.angle.getRadians(), curAngle.getRadians()));
-
         SmartDashboard.putNumber("adjusted angle", adjustedAngle.getDegrees());
 
-        m_turningController.setReference(
-            turnOutput,
-            ControlType.kPosition
-        );        
-        // m_turningMotor.set(turnOutput);
+        // m_turningController.setReference(
+        //     turnOutput,
+        //     ControlType.kPosition
+        // );        
+        m_turningMotor.set(turnOutput);
 
         // Calculate the drive motor output from the drive PID controller.
-        double speedRadPerSec = driveOutput / (Constants.ModuleConstants.kWheelDiameterMeters / 2);
+        final var driveOutput = state.speedMetersPerSecond * 0.1; 
+        // m_drivePIDController.calculate(m_driveEncoder.getVelocity(), state.speedMetersPerSecond)
+        m_driveMotor.set(driveOutput);
 
-        m_driveController.setReference(driveOutput, ControlType.kVelocity, 0,  
-            Constants.ModuleConstants.driveFF.calculate(speedRadPerSec));
-        // m_driveMotor.set(driveOutput);
+        // double speedRadPerSec = driveOutput / (Constants.ModuleConstants.kWheelDiameterMeters / 2);
+
+        // m_driveController.setReference(driveOutput, ControlType.kVelocity, 0,  
+        //     Constants.ModuleConstants.driveFF.calculate(speedRadPerSec));
     }
 
     //calculate the angle motor setpoint based on the desired angle and the current angle measurement
