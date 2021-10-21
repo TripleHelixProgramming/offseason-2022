@@ -146,14 +146,20 @@ public class SparkMaxSwerveModule extends SubsystemBase {
         // final var turnOutput = m_turningPIDController.calculate(m_turningCANCoder.getAbsolutePosition(),
         //         state.angle.getDegrees());
 
-        SmartDashboard.putNumber("target", state.angle.getDegrees());
-        SmartDashboard.putNumber("pos", m_turningCANCoder.getPosition());
+        SmartDashboard.putNumber("target angle", state.angle.getDegrees());
+        SmartDashboard.putNumber("current angle", m_turningCANCoder.getPosition());
 
         double error = m_turningCANCoder.getAbsolutePosition() - state.angle.getDegrees();
         double m01 = ((error + 180) % (360)) - 180;
         double m02 = m01 < -180 ? m01 + 360 : m01;
 
         final var turnOutput = -0.01 * m02;
+
+        Rotation2d curAngle = Rotation2d.fromDegrees(m_turningCANCoder.getPosition());
+        
+        Rotation2d adjustedAngle = new Rotation2d(calculateAdjustedAngle(state.angle.getRadians(), curAngle.getRadians()));
+
+        SmartDashboard.putNumber("adjusted angle", adjustedAngle.getDegrees());
 
         m_turningController.setReference(
             turnOutput,
@@ -170,6 +176,7 @@ public class SparkMaxSwerveModule extends SubsystemBase {
     }
 
     //calculate the angle motor setpoint based on the desired angle and the current angle measurement
+    // Arguments are in radians.
     public double calculateAdjustedAngle(double targetAngle, double currentAngle) {
 
         double modAngle = currentAngle % (2.0 * Math.PI);
