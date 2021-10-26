@@ -136,18 +136,19 @@ public final class Constants {
 
   public static final class ModuleConstants {
 
-    public static final double kDriveP = 0.01;
+    public static final double kDriveP = 0.1;
     public static final double kDriveI = 0.0;
-    public static final double kDriveD = 0.1;
+    public static final double kDriveD = 0.0;
+    public static final double kDriveFF = 2.96;
 
-    public static final double kTurningP = 0.005;
+    public static final double kTurningP = 0.01;
     public static final double kTurningI = 0.0;
-    public static final double kTurningD = 0.1;
+    public static final double kTurningD = 0.005;
     
     public static final double kMaxModuleAngularSpeedRadiansPerSecond = 0.000005 * Math.PI;
     public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 0.000005 * Math.PI;
 
-    public static final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(0.254, 0.137);
+    // public static final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(0.254, 0.137);
     
     public static final double kWheelDiameterMeters = 0.09398; // 3.7 in
 

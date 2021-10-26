@@ -39,7 +39,7 @@ public class SparkMaxSwerveModule extends SubsystemBase {
     private final Rotation2d m_CANCoderOffset;
 
     private final CANPIDController m_turningController;
-    private final CANPIDController m_driveController;
+    private final CANPIDController m_driveController;    
 
     // private final PIDController m_drivePIDController = new PIDController(ModuleConstants.kDriveP,
     //         ModuleConstants.kDriveI, ModuleConstants.kDriveD);
@@ -81,7 +81,7 @@ public class SparkMaxSwerveModule extends SubsystemBase {
         m_driveEncoder.setVelocityConversionFactor(ModuleConstants.kDriveConversionFactor / 60.0);
         m_driveEncoder.setPositionConversionFactor(ModuleConstants.kDriveConversionFactor);
 
-        m_turningEncoder.setPositionConversionFactor(1.0 / ModuleConstants.kTurnPositionConversionFactor);
+        m_turningEncoder.setPositionConversionFactor(360.0 / ModuleConstants.kTurnPositionConversionFactor);
 
         // Limit the PID Controller's input range between -pi and pi and set the input
         // to be continuous.
@@ -97,7 +97,7 @@ public class SparkMaxSwerveModule extends SubsystemBase {
         // 401 only sets P of the drive PID
         m_driveController.setP(Constants.ModuleConstants.kDriveP);
         // m_driveController.setI(Constants.ModuleConstants.kDriveI);
-        // m_driveController.setD(Constants.ModuleConstants.kDriveD);
+        m_driveController.setD(Constants.ModuleConstants.kDriveD);
 
 
     }
@@ -110,10 +110,10 @@ public class SparkMaxSwerveModule extends SubsystemBase {
     public SwerveModuleState getState() {
         // getPosition() returns the number of cumulative rotations.
         // Convert that to 0.0 to 1.0
-        double m1 = m_turningEncoder.getPosition() % 1.0;
-        double m2 = (m1 < 0) ? m1 + 1 : m1;
+        double m1 = m_turningEncoder.getPosition() % 360.0;
+        double m2 = (m1 < 0) ? m1 + 360 : m1;
 
-        return new SwerveModuleState(m_driveEncoder.getVelocity(), new Rotation2d(m2 * 2 * Math.PI));
+        return new SwerveModuleState(m_driveEncoder.getVelocity(), new Rotation2d(m2 * Math.PI / 180));
     }
 
     public CANSparkMax getTurnMotor() {
@@ -132,6 +132,8 @@ public class SparkMaxSwerveModule extends SubsystemBase {
         return m_turningCANCoder.getAbsolutePosition();
     }
 
+    public Rotation2d adjustedAngle = new Rotation2d();
+
     /**
      * Sets the desired state for the module.
      *
@@ -140,49 +142,36 @@ public class SparkMaxSwerveModule extends SubsystemBase {
      */
     public void setDesiredState(SwerveModuleState state) {
 
-        Rotation2d curAngle = Rotation2d.fromDegrees(m_turningCANCoder.getAbsolutePosition());
+        Rotation2d curAngle = Rotation2d.fromDegrees(m_turningEncoder.getPosition());
 
-        SmartDashboard.putNumber("target angle", state.angle.getDegrees());
-        SmartDashboard.putNumber("current angle", curAngle.getDegrees());
+        adjustedAngle = Rotation2d.fromDegrees(calculateAdjustedAngle(state.angle.getDegrees(), curAngle.getDegrees()));
 
-        double error = curAngle.getDegrees() - state.angle.getDegrees();
-        double m01 = ((error + 180) % (360)) - 180;
-        double m02 = m01 < -180 ? m01 + 360 : m01;
-
-        final var turnOutput = -0.01 * m02;
-
-        Rotation2d adjustedAngle = new Rotation2d(calculateAdjustedAngle(state.angle.getRadians(), curAngle.getRadians()));
-        SmartDashboard.putNumber("adjusted angle", adjustedAngle.getDegrees());
-
-        // m_turningController.setReference(
-        //     turnOutput,
-        //     ControlType.kPosition
-        // );        
-        m_turningMotor.set(turnOutput);
+        m_turningController.setReference(
+            adjustedAngle.getDegrees(),
+            ControlType.kPosition
+        );        
 
         // Calculate the drive motor output from the drive PID controller.
-        final var driveOutput = state.speedMetersPerSecond * 0.1; 
-        // m_drivePIDController.calculate(m_driveEncoder.getVelocity(), state.speedMetersPerSecond)
-        m_driveMotor.set(driveOutput);
+        final var driveOutput = state.speedMetersPerSecond; 
+        // m_driveMotor.set(driveOutput);
 
-        // double speedRadPerSec = driveOutput / (Constants.ModuleConstants.kWheelDiameterMeters / 2);
+        SmartDashboard.putNumber("Commanded Velocity", driveOutput);
 
-        // m_driveController.setReference(driveOutput, ControlType.kVelocity, 0,  
-        //     Constants.ModuleConstants.driveFF.calculate(speedRadPerSec));
+        m_driveController.setReference(driveOutput, ControlType.kVelocity, 0, Constants.ModuleConstants.kDriveFF * driveOutput);
     }
 
     //calculate the angle motor setpoint based on the desired angle and the current angle measurement
     // Arguments are in radians.
     public double calculateAdjustedAngle(double targetAngle, double currentAngle) {
 
-        double modAngle = currentAngle % (2.0 * Math.PI);
+        double modAngle = currentAngle % (360);
 
-        if (modAngle < 0.0) modAngle += 2.0 * Math.PI;
+        if (modAngle < 0.0) modAngle += 360;
         
         double newTarget = targetAngle + currentAngle - modAngle;
 
-        if (targetAngle - modAngle > Math.PI) newTarget -= 2.0 * Math.PI;
-        else if (targetAngle - modAngle < -Math.PI) newTarget += 2.0 * Math.PI;
+        if (targetAngle - modAngle > 180) newTarget -= 360;
+        else if (targetAngle - modAngle < -180) newTarget += 360;
 
         return newTarget;
 
@@ -194,6 +183,10 @@ public class SparkMaxSwerveModule extends SubsystemBase {
 
     public void resetDistance() {
         m_driveEncoder.setPosition(0.0);
+    }
+
+    public void syncTurningEncoders() {
+        m_turningEncoder.setPosition(m_turningCANCoder.getAbsolutePosition());
     }
 
     /** Zeros all the SwerveModule encoders. */

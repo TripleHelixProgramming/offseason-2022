@@ -56,12 +56,23 @@ public class RobotContainer {
 
     // Configure default commands
 
-    m_robotDrive.setDefaultCommand(new RunCommand(() -> m_robotDrive.setModuleStates(new SwerveModuleState[]{
-      new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight), new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft))),
-      new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight), new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft))),
-      new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight), new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft))),
-      new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight), new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft)))}),
-      m_robotDrive));
+    m_robotDrive.setDefaultCommand(
+      new RunCommand(
+        () -> m_robotDrive.drive(
+          m_driverController.getY(GenericHID.Hand.kRight), 
+          m_driverController.getX(GenericHID.Hand.kRight),
+          m_driverController.getX(GenericHID.Hand.kLeft), 
+          true)
+        , m_robotDrive)
+    );
+
+
+    // m_robotDrive.setDefaultCommand(new RunCommand(() -> m_robotDrive.setModuleStates(new SwerveModuleState[]{
+    //   new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight) * 5, new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft))),
+    //   new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight) * 5, new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft))),
+    //   new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight) * 5, new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft))),
+    //   new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight) * 5, new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft)))}),
+    //   m_robotDrive));
   }
 
   /**
