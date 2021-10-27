@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
+import frc.lib.Curve;
+import frc.lib.LinCurve;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
@@ -17,6 +19,7 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
@@ -46,11 +49,16 @@ public class RobotContainer {
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
   JoystickButton xButton = new JoystickButton(m_driverController, 3);
+  JoystickButton backButton = new JoystickButton(m_driverController, 7);
+  JoystickButton startButton = new JoystickButton(m_driverController, 8);
+
+  Curve deadzoneCurve = new LinCurve(0.0, 1.0, 0.4);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+
     // Configure the button bindings
     configureButtonBindings();
 
@@ -59,9 +67,9 @@ public class RobotContainer {
     m_robotDrive.setDefaultCommand(
       new RunCommand(
         () -> m_robotDrive.drive(
-          m_driverController.getY(GenericHID.Hand.kRight), 
-          m_driverController.getX(GenericHID.Hand.kRight),
-          m_driverController.getX(GenericHID.Hand.kLeft), 
+          deadzoneCurve.calculateMappedVal(m_driverController.getY(GenericHID.Hand.kRight)), 
+          deadzoneCurve.calculateMappedVal(m_driverController.getX(GenericHID.Hand.kRight)),
+          deadzoneCurve.calculateMappedVal(m_driverController.getX(GenericHID.Hand.kLeft)), 
           true)
         , m_robotDrive)
     );
@@ -82,8 +90,51 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    xButton.whenPressed(() -> {
-      m_robotDrive.resetEncoders();
+
+    backButton.whenPressed(new Command(){
+
+      @Override
+      public Set<Subsystem> getRequirements() {
+        return Set.of(m_robotDrive);
+      }
+      
+      @Override
+      public boolean runsWhenDisabled() {
+        return true;
+      }
+
+      @Override
+      public void execute() {
+        m_robotDrive.zeroHeading();
+      }
+
+      @Override
+      public boolean isFinished() {
+        return true;
+      }
+    });
+
+    startButton.whenPressed(new Command(){
+
+      @Override
+      public Set<Subsystem> getRequirements() {
+        return Set.of(m_robotDrive);
+      }
+      
+      @Override
+      public boolean runsWhenDisabled() {
+        return true;
+      }
+
+      @Override
+      public void execute() {
+        m_robotDrive.resetEncoders();
+      }
+
+      @Override
+      public boolean isFinished() {
+        return true;
+      }
     });
   }
 
