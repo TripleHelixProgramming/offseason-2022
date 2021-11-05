@@ -65,9 +65,11 @@ public class SparkDriveSubsystem extends SubsystemBase {
   /** Creates a new DriveSubsystem. */
   public SparkDriveSubsystem() {
 
-    m_odometry = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, getHeading());
+    // Zero out the gyro.
+    m_gyro.calibrate();
+    m_gyro.reset();
 
-    zeroHeading();
+    m_odometry = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, getHeading());
 
     m_frontLeft.resetDistance();
     m_frontRight.resetDistance();

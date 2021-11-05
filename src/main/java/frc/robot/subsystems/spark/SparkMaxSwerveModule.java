@@ -14,12 +14,9 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.ControlType;
 
-import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ModuleConstants;
@@ -40,15 +37,6 @@ public class SparkMaxSwerveModule extends SubsystemBase {
 
     private final CANPIDController m_turningController;
     private final CANPIDController m_driveController;    
-
-    // private final PIDController m_drivePIDController = new PIDController(ModuleConstants.kDriveP,
-    //         ModuleConstants.kDriveI, ModuleConstants.kDriveD);
-
-    // // Using a TrapezoidProfile PIDController to allow for smooth turning
-    // private final ProfiledPIDController m_turningPIDController = new ProfiledPIDController(ModuleConstants.kTurningP,
-    //         ModuleConstants.kTurningI, ModuleConstants.kTurningD,
-    //         new TrapezoidProfile.Constraints(ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
-    //                 ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
 
     /**
      * Constructs a SwerveModule.
@@ -71,6 +59,7 @@ public class SparkMaxSwerveModule extends SubsystemBase {
         m_turningCANCoder = new CANCoder(turningCANCoderChannel);
         m_turningCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
         m_turningCANCoder.setPosition(0);
+        
         m_CANCoderOffset = Rotation2d.fromDegrees(turningCANCoderOffsetDegrees);
 
         m_driveMotor.setIdleMode(IdleMode.kBrake);
@@ -83,10 +72,6 @@ public class SparkMaxSwerveModule extends SubsystemBase {
 
         m_turningEncoder.setPositionConversionFactor(360.0 / ModuleConstants.kTurnPositionConversionFactor);
 
-        // Limit the PID Controller's input range between -pi and pi and set the input
-        // to be continuous.
-        // m_turningPIDController.enableContinuousInput(0, 360);
-
         m_turningController = m_turningMotor.getPIDController();
         m_driveController = m_driveMotor.getPIDController();
 
@@ -98,8 +83,6 @@ public class SparkMaxSwerveModule extends SubsystemBase {
         m_driveController.setP(Constants.ModuleConstants.kDriveP);
         // m_driveController.setI(Constants.ModuleConstants.kDriveI);
         m_driveController.setD(Constants.ModuleConstants.kDriveD);
-
-
     }
 
     /**
@@ -110,8 +93,10 @@ public class SparkMaxSwerveModule extends SubsystemBase {
     public SwerveModuleState getState() {
         // getPosition() returns the number of cumulative rotations.
         // Convert that to 0.0 to 1.0
-        double m1 = m_turningEncoder.getPosition() % 360.0;
-        double m2 = (m1 < 0) ? m1 + 360 : m1;
+        // double m1 = m_turningEncoder.getPosition() % 360.0;
+        // double m2 = (m1 < 0) ? m1 + 360 : m1;
+
+        double m2 = (m_turningEncoder.getPosition() % 360 + 360) % 360;
 
         return new SwerveModuleState(m_driveEncoder.getVelocity(), new Rotation2d(m2 * Math.PI / 180));
     }
@@ -164,16 +149,18 @@ public class SparkMaxSwerveModule extends SubsystemBase {
     // Arguments are in radians.
     public double calculateAdjustedAngle(double targetAngle, double currentAngle) {
 
-        double modAngle = currentAngle % (360);
+        // double modAngle = currentAngle % (360);
 
-        if (modAngle < 0.0) modAngle += 360;
+        // if (modAngle < 0.0) modAngle += 360;
         
-        double newTarget = targetAngle + currentAngle - modAngle;
+        // double newTarget = targetAngle + currentAngle - modAngle;
 
-        if (targetAngle - modAngle > 180) newTarget -= 360;
-        else if (targetAngle - modAngle < -180) newTarget += 360;
+        // if (targetAngle - modAngle > 180) newTarget -= 360;
+        // else if (targetAngle - modAngle < -180) newTarget += 360;
 
-        return newTarget;
+        // return newTarget;
+
+        return ((targetAngle - currentAngle + 180) % 360 + 360) % 360 - 180 + currentAngle;
 
     }
 

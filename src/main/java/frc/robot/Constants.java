@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
@@ -38,40 +37,6 @@ public final class Constants {
       public static final int kRearLeftTurningMotorPort = 25;
     }
 
-    public static final class TalonCAN {
-      public static final int kFrontLeftDriveMotorPort = 0;
-      public static final int kRearLeftDriveMotorPort = 2;
-      public static final int kFrontRightDriveMotorPort = 4;
-      public static final int kRearRightDriveMotorPort = 6;
-  
-      public static final int kFrontLeftTurningMotorPort = 1;
-      public static final int kRearLeftTurningMotorPort = 3;
-      public static final int kFrontRightTurningMotorPort = 5;
-      public static final int kRearRightTurningMotorPort = 7;  
-    }
-
-    public static final class Example {
-      public static final int kFrontLeftDriveMotorPort = 0;
-      public static final int kRearLeftDriveMotorPort = 2;
-      public static final int kFrontRightDriveMotorPort = 4;
-      public static final int kRearRightDriveMotorPort = 6;
-
-      public static final int kFrontLeftTurningMotorPort = 1;
-      public static final int kRearLeftTurningMotorPort = 3;
-      public static final int kFrontRightTurningMotorPort = 5;
-      public static final int kRearRightTurningMotorPort = 7;
-
-      public static final int[] kFrontLeftDriveEncoderPorts = new int[] {8, 9};
-      public static final int[] kRearLeftDriveEncoderPorts = new int[] {10, 11};
-      public static final int[] kFrontRightDriveEncoderPorts = new int[] {12, 13};
-      public static final int[] kRearRightDriveEncoderPorts = new int[] {14, 15};
-
-      public static final int[] kFrontLeftTurningEncoderPorts = new int[] {0, 1};
-      public static final int[] kRearLeftTurningEncoderPorts = new int[] {2, 3};
-      public static final int[] kFrontRightTurningEncoderPorts = new int[] {4, 5};
-      public static final int[] kRearRightTurningEncoderPorts = new int[] {6, 7};  
-    }
-
     public static final class CANCoder {
       // Below provided by SparkMAX motors API.
       // public static final int kFrontLeftDriveEncoderPort = 
@@ -88,7 +53,6 @@ public final class Constants {
       public static final double kFrontRightTurningEncoderOffset = 180.0;
       public static final double kFrontLefTurningEncoderOffset = 180.0;
       public static final double kRearLeftTurningEncoderOffset = 180.0;
-
     }
 
     public static final boolean kFrontLeftDriveEncoderReversed = false;
@@ -158,17 +122,6 @@ public final class Constants {
     public static final double kDriveConversionFactor = (kWheelDiameterMeters * Math.PI) / kDriveGearRatio;
 
     public static final double kTurnPositionConversionFactor = 12.8;
-
-    public static final int kEncoderCPR = 1024;
-
-    public static final double kDriveEncoderDistancePerPulse =
-    // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
-
-    public static final double kTurningEncoderDistancePerPulse =
-    // Assumes the encoders are on a 1:1 reduction with the module shaft.
-    (2 * Math.PI) / (double) kEncoderCPR;
-
   }
 
   public static final class OIConstants {
