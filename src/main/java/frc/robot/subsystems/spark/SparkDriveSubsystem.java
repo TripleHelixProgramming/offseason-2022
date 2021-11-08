@@ -16,6 +16,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 // import com.ctre.phoenix.sensors.PigeonIMU;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -142,17 +145,33 @@ public class SparkDriveSubsystem extends SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   @SuppressWarnings("ParameterName")
-  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+  public void drive(double xScale, double yScale, double rotScale, boolean fieldRelative) {
 
+    double xDot = xScale * DriveConstants.kMaxTranslationalVelocity;
+    double yDot = yScale * DriveConstants.kMaxTranslationalVelocity;
+    double omega = rotScale * DriveConstants.kMaxRotationalVelocity;
 
     ChassisSpeeds speeds = fieldRelative
-                            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getHeading())
-                            : new ChassisSpeeds(xSpeed, ySpeed, rot);
+                            ? ChassisSpeeds.fromFieldRelativeSpeeds(xDot, yDot, omega, getHeading())
+                            : new ChassisSpeeds(xDot, yDot, omgea);
     
     SwerveModuleState[] swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
            
+    normalizeDrive(swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond, xScale, yScale, rotScale);
     setModuleStates(swerveModuleStates);
+  }
+
+  public void normalizeDrive(SwerveModuleState[] desiredStates, 
+                                      double maxVelocity,
+                                      double x,
+                                      double y,
+                                      double theta) {
+    double realMaxSpeed = Collections.max(Arrays.asList(moduleStates)).speedMetersPerSecond;
+    double k = Math.max(Math.sqrt(x^2 + y^2), Math.abs(theta));
+    for (SwerveModuleState moduleState : moduleStates) {
+        moduleState.speedMetersPerSecond *= k * maxVelocity / realMaxSpeed;
+    }
   }
 
   /**
