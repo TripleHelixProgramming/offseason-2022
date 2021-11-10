@@ -153,7 +153,7 @@ public class SparkDriveSubsystem extends SubsystemBase {
 
     ChassisSpeeds speeds = fieldRelative
                             ? ChassisSpeeds.fromFieldRelativeSpeeds(xDot, yDot, omega, getHeading())
-                            : new ChassisSpeeds(xDot, yDot, omgea);
+                            : new ChassisSpeeds(xDot, yDot, omega);
     
     SwerveModuleState[] swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
@@ -167,9 +167,12 @@ public class SparkDriveSubsystem extends SubsystemBase {
                                       double x,
                                       double y,
                                       double theta) {
-    double realMaxSpeed = Collections.max(Arrays.asList(moduleStates)).speedMetersPerSecond;
-    double k = Math.max(Math.sqrt(x^2 + y^2), Math.abs(theta));
-    for (SwerveModuleState moduleState : moduleStates) {
+    double realMaxSpeed = 0;
+    for (SwerveModuleState module : desiredStates) {
+      realMaxSpeed = Math.max(Math.abs(module.speedMetersPerSecond), realMaxSpeed);
+    }
+    double k = Math.max(Math.sqrt(x*x + y*y), Math.abs(theta));
+    for (SwerveModuleState moduleState : desiredStates) {
         moduleState.speedMetersPerSecond *= k * maxVelocity / realMaxSpeed;
     }
   }
