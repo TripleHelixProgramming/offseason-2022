@@ -72,6 +72,12 @@ public final class Constants {
     // Distance between front and back wheels on robot
     public static final double kWheelBase = 0.6223; // 24.5 in
 
+    // Units are meters per second
+    public static final double kMaxTranslationalVelocity = 3;
+
+    // Units are radians per second
+    public static final double kMaxRotationalVelocity = 5;
+
     //The locations for the modules must be relative to the center of the robot. 
     // Positive x values represent moving toward the front of the robot 
     // Positive y values represent moving toward the left of the robot.
