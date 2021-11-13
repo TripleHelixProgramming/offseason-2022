@@ -167,13 +167,17 @@ public class SparkDriveSubsystem extends SubsystemBase {
                                       double x,
                                       double y,
                                       double theta) {
-    double realMaxSpeed = 0;
+    double realMaxSpeed = 0.0;
     for (SwerveModuleState module : desiredStates) {
-      realMaxSpeed = Math.max(Math.abs(module.speedMetersPerSecond), realMaxSpeed);
+      if (Math.abs(module.speedMetersPerSecond) > realMaxSpeed) {
+        realMaxSpeed = Math.abs(module.speedMetersPerSecond);
+      }
     }
     double k = Math.max(Math.sqrt(x*x + y*y), Math.abs(theta));
-    for (SwerveModuleState moduleState : desiredStates) {
-        moduleState.speedMetersPerSecond *= k * maxVelocity / realMaxSpeed;
+    if (realMaxSpeed != 0.0) {
+      for (SwerveModuleState moduleState : desiredStates) {
+        moduleState.speedMetersPerSecond *= (k * maxVelocity / realMaxSpeed);
+      }
     }
   }
 
