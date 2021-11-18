@@ -73,10 +73,10 @@ public final class Constants {
     public static final double kWheelBase = 0.6223; // 24.5 in
 
     // Units are meters per second
-    public static final double kMaxTranslationalVelocity = 3;
+    public static final double kMaxTranslationalVelocity = 4.5;
 
     // Units are radians per second
-    public static final double kMaxRotationalVelocity = 5;
+    public static final double kMaxRotationalVelocity = 5.0;
 
     //The locations for the modules must be relative to the center of the robot. 
     // Positive x values represent moving toward the front of the robot 

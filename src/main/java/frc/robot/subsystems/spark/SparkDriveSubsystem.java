@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 
+import com.analog.adis16470.frc.ADIS16470_IMU;
+
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -59,7 +61,7 @@ public class SparkDriveSubsystem extends SubsystemBase {
           );
 
   // The gyro sensor
-  private final Gyro m_gyro = new ADXRS450_Gyro();
+  private final Gyro m_gyro =  new ADIS16470_IMU(); // new ADXRS450_Gyro();
   // private final PigeonIMU m_pigeon = new PigeonIMU(DriveConstants.kPigeonPort);
 
   // Odometry class for tracking robot pose
@@ -167,12 +169,15 @@ public class SparkDriveSubsystem extends SubsystemBase {
                                       double x,
                                       double y,
                                       double theta) {
+
+    // Find the how fast the fastest spinning drive motor is spinning                                       
     double realMaxSpeed = 0.0;
     for (SwerveModuleState module : desiredStates) {
       if (Math.abs(module.speedMetersPerSecond) > realMaxSpeed) {
         realMaxSpeed = Math.abs(module.speedMetersPerSecond);
       }
     }
+    
     double k = Math.max(Math.sqrt(x*x + y*y), Math.abs(theta));
     if (realMaxSpeed != 0.0) {
       for (SwerveModuleState moduleState : desiredStates) {
@@ -219,6 +224,7 @@ public class SparkDriveSubsystem extends SubsystemBase {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
+    m_gyro.calibrate();
     m_gyro.reset();
 //    m_pigeon.setYaw(0.0);
   }
