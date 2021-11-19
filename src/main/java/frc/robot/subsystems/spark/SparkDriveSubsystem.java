@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 import com.analog.adis16470.frc.ADIS16470_IMU;
@@ -67,6 +68,10 @@ public class SparkDriveSubsystem extends SubsystemBase {
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry;
 
+  //target pose and controllers
+  Pose2d m_targetPose;
+  PIDController m_thetaController = new PIDController(1.0, 0.0, 0.0);
+
   /** Creates a new DriveSubsystem. */
   public SparkDriveSubsystem() {
 
@@ -85,6 +90,9 @@ public class SparkDriveSubsystem extends SubsystemBase {
     m_frontRight.syncTurningEncoders();
     m_rearLeft.syncTurningEncoders();
     m_rearRight.syncTurningEncoders();
+
+    m_targetPose = m_odometry.getPoseMeters();
+    m_thetaController.reset();
   }
 
   @Override
@@ -151,11 +159,14 @@ public class SparkDriveSubsystem extends SubsystemBase {
 
     double xDot = xScale * DriveConstants.kMaxTranslationalVelocity;
     double yDot = yScale * DriveConstants.kMaxTranslationalVelocity;
-    double omega = rotScale * DriveConstants.kMaxRotationalVelocity;
+    //double omega = rotScale * DriveConstants.kMaxRotationalVelocity;
+
+    m_targetPose.getRotation().rotateBy(new Rotation2d(rotScale));
+    double omegaDot = m_thetaController.calculate(m_odometry.getPoseMeters().getRotation().getDegrees(), m_targetPose.getRotation().getDegrees());
 
     ChassisSpeeds speeds = fieldRelative
-                            ? ChassisSpeeds.fromFieldRelativeSpeeds(xDot, yDot, omega, getHeading())
-                            : new ChassisSpeeds(xDot, yDot, omega);
+                            ? ChassisSpeeds.fromFieldRelativeSpeeds(xDot, yDot, omegaDot, getHeading())
+                            : new ChassisSpeeds(xDot, yDot, omegaDot);
     
     SwerveModuleState[] swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
