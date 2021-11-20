@@ -2,9 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.spark;
+package frc.robot.drive;
 
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
@@ -12,49 +13,47 @@ import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.controller.PIDController;
+// import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+// import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
-
 import com.analog.adis16470.frc.ADIS16470_IMU;
 
 import java.util.Arrays;
 import java.util.Collections;
 
-// import com.ctre.phoenix.sensors.PigeonIMU;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 @SuppressWarnings("PMD.ExcessiveImports")
-public class SparkDriveSubsystem extends SubsystemBase {
+public class Drivetrain extends SubsystemBase {
   // Robot swerve modules
-  private final SparkMaxSwerveModule m_frontLeft =
-      new SparkMaxSwerveModule(
+  private final SwerveModule m_frontLeft =
+      new SwerveModule(
           DriveConstants.SparkCAN.kFrontLeftDriveMotorPort,
           DriveConstants.SparkCAN.kFrontLeftTurningMotorPort,
           DriveConstants.CANCoder.kFrontLefTurningEncoderPort,
           DriveConstants.CANCoder.kFrontLefTurningEncoderOffset
           );
 
-  private final SparkMaxSwerveModule m_frontRight =
-      new SparkMaxSwerveModule(
+  private final SwerveModule m_frontRight =
+      new SwerveModule(
           DriveConstants.SparkCAN.kFrontRightDriveMotorPort,
           DriveConstants.SparkCAN.kFrontRightTurningMotorPort,
           DriveConstants.CANCoder.kFrontRightTurningEncoderPort,
           DriveConstants.CANCoder.kFrontRightTurningEncoderOffset
           );
 
-  private final SparkMaxSwerveModule m_rearLeft =
-      new SparkMaxSwerveModule(
+  private final SwerveModule m_rearLeft =
+      new SwerveModule(
           DriveConstants.SparkCAN.kRearLeftDriveMotorPort,
           DriveConstants.SparkCAN.kRearLeftTurningMotorPort,
           DriveConstants.CANCoder.kRearLeftTurningEncoderPort,
           DriveConstants.CANCoder.kRearLeftTurningEncoderOffset
           );
 
-  private final SparkMaxSwerveModule m_rearRight =
-      new SparkMaxSwerveModule(
+  private final SwerveModule m_rearRight =
+      new SwerveModule(
           DriveConstants.SparkCAN.kRearRightDriveMotorPort,
           DriveConstants.SparkCAN.kRearRightTurningMotorPort,
           DriveConstants.CANCoder.kRearRightTurningEncoderPort,
@@ -68,12 +67,13 @@ public class SparkDriveSubsystem extends SubsystemBase {
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry;
 
-  //target pose and controllers
+  //target pose and controller
   Pose2d m_targetPose;
-  PIDController m_thetaController = new PIDController(1.0, 0.0, 0.0);
-
+  ProfiledPIDController m_thetaController = new ProfiledPIDController(
+    AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
+    
   /** Creates a new DriveSubsystem. */
-  public SparkDriveSubsystem() {
+  public Drivetrain() {
 
     // Zero out the gyro.
     m_gyro.calibrate();
@@ -92,7 +92,8 @@ public class SparkDriveSubsystem extends SubsystemBase {
     m_rearRight.syncTurningEncoders();
 
     m_targetPose = m_odometry.getPoseMeters();
-    m_thetaController.reset();
+    //m_thetaController.reset();
+    m_thetaController.enableContinuousInput(-Math.PI, Math.PI);
   }
 
   @Override
@@ -105,7 +106,7 @@ public class SparkDriveSubsystem extends SubsystemBase {
         m_rearLeft.getState(),
         m_rearRight.getState());
 
-    SparkMaxSwerveModule[] modules = {m_frontLeft, m_frontRight, m_rearLeft, m_rearRight};
+    SwerveModule[] modules = {m_frontLeft, m_frontRight, m_rearLeft, m_rearRight};
     
     SmartDashboard.putNumber("Heading", getHeading().getDegrees());
 
@@ -147,39 +148,57 @@ public class SparkDriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Method to drive the robot using joystick info.
+   * Method to rotate the relative orientation of the target pose at a given rate.
    *
-   * @param xSpeed Speed of the robot in the x direction (forward).
-   * @param ySpeed Speed of the robot in the y direction (sideways).
-   * @param rot Angular rate of the robot.
-   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
+   * @param deltaTheta How much to rotate the target orientation per loop.
+   */
+  public void rotateRelative(Rotation2d deltaTheta) {
+    m_targetPose.getRotation().rotateBy(deltaTheta);
+  }
+
+  /**
+   * Method to set the absolute orientation of the target pose.
+   *
+   * @param theta The target orientation.
+   */
+  public void rotateAbsolute(Rotation2d theta) {
+    m_targetPose.getRotation().rotateBy(theta.minus(m_targetPose.getRotation()));
+  }
+
+  /**
+   * Method to get the output of the chassis orientation PID controller.
+   *
+   */
+  public double getThetaDot() {
+    double setpoint = m_targetPose.getRotation().getDegrees();
+    double measurement = getPose().getRotation().getDegrees();
+    return m_thetaController.calculate(measurement, setpoint);
+  }
+
+  /**
+   * Method to drive the robot with given velocities.
+   *
+   * @param speeds ChassisSpeeds object with the desired chassis speeds [m/s and rad/s].
    */
   @SuppressWarnings("ParameterName")
-  public void drive(double xScale, double yScale, double rotScale, boolean fieldRelative) {
+  public void drive(ChassisSpeeds speeds) {
 
-    double xDot = xScale * DriveConstants.kMaxTranslationalVelocity;
-    double yDot = yScale * DriveConstants.kMaxTranslationalVelocity;
-    //double omega = rotScale * DriveConstants.kMaxRotationalVelocity;
-
-    m_targetPose.getRotation().rotateBy(new Rotation2d(rotScale));
-    double omegaDot = m_thetaController.calculate(m_odometry.getPoseMeters().getRotation().getDegrees(), m_targetPose.getRotation().getDegrees());
-
-    ChassisSpeeds speeds = fieldRelative
-                            ? ChassisSpeeds.fromFieldRelativeSpeeds(xDot, yDot, omegaDot, getHeading())
-                            : new ChassisSpeeds(xDot, yDot, omegaDot);
+    //double xDot, double yDot, double thetaDot, boolean fieldRelative
     
     SwerveModuleState[] swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
            
-    normalizeDrive(swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond, xScale, yScale, rotScale);
+    normalizeDrive(swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond, speeds);
     setModuleStates(swerveModuleStates);
   }
 
   public void normalizeDrive(SwerveModuleState[] desiredStates, 
                                       double maxVelocity,
-                                      double x,
-                                      double y,
-                                      double theta) {
+                                      ChassisSpeeds speeds) {
+
+    double x = speeds.vxMetersPerSecond;
+    double y = speeds.vyMetersPerSecond;
+    double theta = speeds.omegaRadiansPerSecond;
 
     // Find the how fast the fastest spinning drive motor is spinning                                       
     double realMaxSpeed = 0.0;

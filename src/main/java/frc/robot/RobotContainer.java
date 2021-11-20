@@ -9,16 +9,18 @@ import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
-import frc.lib.Curve;
-import frc.lib.LinCurve;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.spark.SparkDriveSubsystem;
+import frc.robot.drive.Drivetrain;
+import frc.robot.drive.commands.ZeroHeading;
+import frc.robot.drive.commands.JoystickDrive;
+import frc.robot.drive.commands.ResetEncoders;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
@@ -41,8 +43,21 @@ import java.util.Set;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+
+  private static RobotContainer INSTANCE;
+
+  /**
+   * @return retrieves the singleton instance of the Robot Container
+   */
+  public static RobotContainer getInstance() {
+    if (INSTANCE == null) {
+      INSTANCE = new RobotContainer();
+    }
+    return INSTANCE;
+  }
+
   // The robot's subsystems
-  private final SparkDriveSubsystem m_robotDrive = new SparkDriveSubsystem();
+  private final Drivetrain m_robotDrive = new Drivetrain();
   private final PowerDistributionPanel m_PDP = new PowerDistributionPanel(0);
 
   // The driver's controller
@@ -51,8 +66,6 @@ public class RobotContainer {
   JoystickButton xButton = new JoystickButton(m_driverController, 3);
   JoystickButton backButton = new JoystickButton(m_driverController, 7);
   JoystickButton startButton = new JoystickButton(m_driverController, 8);
-
-  Curve deadzoneCurve = new LinCurve(0.0, 1.0, 0.4);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -63,17 +76,7 @@ public class RobotContainer {
     configureButtonBindings();
 
     // Configure default commands
-
-    m_robotDrive.setDefaultCommand(
-      new RunCommand(
-        () -> m_robotDrive.drive(
-          deadzoneCurve.calculateMappedVal(m_driverController.getY(GenericHID.Hand.kRight)), 
-          deadzoneCurve.calculateMappedVal(m_driverController.getX(GenericHID.Hand.kRight)),
-          deadzoneCurve.calculateMappedVal(m_driverController.getX(GenericHID.Hand.kLeft)), 
-          true)
-        , m_robotDrive)
-    );
-
+    setDefaultCommands();
 
     // m_robotDrive.setDefaultCommand(new RunCommand(() -> m_robotDrive.setModuleStates(new SwerveModuleState[]{
     //   new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight) * 5, new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft))),
@@ -81,6 +84,10 @@ public class RobotContainer {
     //   new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight) * 5, new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft))),
     //   new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight) * 5, new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft)))}),
     //   m_robotDrive));
+  }
+
+  private void setDefaultCommands() {
+    m_robotDrive.setDefaultCommand(new JoystickDrive(m_robotDrive));
   }
 
   /**
@@ -91,51 +98,8 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
 
-    backButton.whenPressed(new Command(){
-
-      @Override
-      public Set<Subsystem> getRequirements() {
-        return Set.of(m_robotDrive);
-      }
-      
-      @Override
-      public boolean runsWhenDisabled() {
-        return true;
-      }
-
-      @Override
-      public void execute() {
-        m_robotDrive.zeroHeading();
-      }
-
-      @Override
-      public boolean isFinished() {
-        return true;
-      }
-    });
-
-    startButton.whenPressed(new Command(){
-
-      @Override
-      public Set<Subsystem> getRequirements() {
-        return Set.of(m_robotDrive);
-      }
-      
-      @Override
-      public boolean runsWhenDisabled() {
-        return true;
-      }
-
-      @Override
-      public void execute() {
-        m_robotDrive.resetEncoders();
-      }
-
-      @Override
-      public boolean isFinished() {
-        return true;
-      }
-    });
+    backButton.whenPressed(new ZeroHeading(m_robotDrive));
+    startButton.whenPressed(new ResetEncoders(m_robotDrive));
   }
 
   /**
@@ -185,7 +149,19 @@ public class RobotContainer {
     m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
 
     // Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
+    ChassisSpeeds stop = new ChassisSpeeds(0.0, 0.0, 0.0);
+    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(stop));
   }
 
+  public double getTranslateXJoystick() {
+    return m_driverController.getY(GenericHID.Hand.kRight);
+  }
+
+  public double getTranslateYJoystick() {
+    return m_driverController.getX(GenericHID.Hand.kRight);
+  }
+
+  public double getRotateJoystick() {
+    return m_driverController.getX(GenericHID.Hand.kLeft);
+  }
 }
