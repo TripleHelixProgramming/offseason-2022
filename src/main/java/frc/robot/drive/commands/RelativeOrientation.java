@@ -12,10 +12,12 @@ import frc.robot.drive.Drivetrain;
 import frc.lib.Curve;
 import frc.lib.LinCurve;
 
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class RelativeOrientation extends JoystickDrive {
 
     double dt = 0.02;   //20 ms
-    double joyScale = DriveConstants.kMaxRotationalVelocity / dt;
+    double joyScale = DriveConstants.kMaxRotationalVelocity * dt;
     Curve joyMap = new LinCurve(0.0, joyScale, 0.4);
     
     public RelativeOrientation(Drivetrain subsystem) {

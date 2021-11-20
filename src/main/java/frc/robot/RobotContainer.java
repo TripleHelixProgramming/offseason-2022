@@ -15,6 +15,8 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.drive.Drivetrain;
 import frc.robot.drive.commands.ZeroHeading;
 import frc.robot.drive.commands.JoystickDrive;
+import frc.robot.drive.commands.RelativeOrientation;
+import frc.robot.drive.commands.AbsoluteOrientation;
 import frc.robot.drive.commands.ResetEncoders;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -87,7 +89,7 @@ public class RobotContainer {
   }
 
   private void setDefaultCommands() {
-    m_robotDrive.setDefaultCommand(new JoystickDrive(m_robotDrive));
+    m_robotDrive.setDefaultCommand(new RelativeOrientation(m_robotDrive));
   }
 
   /**

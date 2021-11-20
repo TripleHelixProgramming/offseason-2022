@@ -8,12 +8,15 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Transform2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
+import edu.wpi.first.wpilibj.controller.PIDController;
+//import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 
 // import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 // import com.ctre.phoenix.sensors.PigeonIMU;
@@ -69,8 +72,9 @@ public class Drivetrain extends SubsystemBase {
 
   //target pose and controller
   Pose2d m_targetPose;
-  ProfiledPIDController m_thetaController = new ProfiledPIDController(
-    AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
+  PIDController m_thetaController = new PIDController(1.0, 0.0, 0.05);
+  //ProfiledPIDController m_thetaController = new ProfiledPIDController(
+  //  AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
     
   /** Creates a new DriveSubsystem. */
   public Drivetrain() {
@@ -92,7 +96,7 @@ public class Drivetrain extends SubsystemBase {
     m_rearRight.syncTurningEncoders();
 
     m_targetPose = m_odometry.getPoseMeters();
-    //m_thetaController.reset();
+    m_thetaController.reset();
     m_thetaController.enableContinuousInput(-Math.PI, Math.PI);
   }
 
@@ -124,6 +128,9 @@ public class Drivetrain extends SubsystemBase {
 
     SmartDashboard.putNumber("RearRight Velocity", modules[3].getState().speedMetersPerSecond);
     SmartDashboard.putNumber("RearRight Angle", modules[3].getState().angle.getDegrees());
+    
+    SmartDashboard.putNumber("currentAngle", getPose().getRotation().getRadians());
+    SmartDashboard.putNumber("targetPoseAngle", m_targetPose.getRotation().getRadians());
 
     // SmartDashboard.putNumber("FronLeft Turning CANcoder Mag Offset", modules[0].getTurnCANcoder().configGetMagnetOffset());
     // SmartDashboard.putNumber("FronLeft Turning CANcoder Abs Position", modules[0].getTurnCANcoder().getAbsolutePosition());
@@ -153,7 +160,8 @@ public class Drivetrain extends SubsystemBase {
    * @param deltaTheta How much to rotate the target orientation per loop.
    */
   public void rotateRelative(Rotation2d deltaTheta) {
-    m_targetPose.getRotation().rotateBy(deltaTheta);
+    Transform2d transform = new Transform2d(new Translation2d(), deltaTheta);
+    m_targetPose = m_targetPose.transformBy(transform);
   }
 
   /**
@@ -162,7 +170,7 @@ public class Drivetrain extends SubsystemBase {
    * @param theta The target orientation.
    */
   public void rotateAbsolute(Rotation2d theta) {
-    m_targetPose.getRotation().rotateBy(theta.minus(m_targetPose.getRotation()));
+    m_targetPose = new Pose2d(new Translation2d(), theta);
   }
 
   /**
@@ -170,9 +178,11 @@ public class Drivetrain extends SubsystemBase {
    *
    */
   public double getThetaDot() {
-    double setpoint = m_targetPose.getRotation().getDegrees();
-    double measurement = getPose().getRotation().getDegrees();
-    return m_thetaController.calculate(measurement, setpoint);
+    double setpoint = m_targetPose.getRotation().getRadians();
+    double measurement = getPose().getRotation().getRadians();
+    double output = m_thetaController.calculate(measurement, setpoint);
+    SmartDashboard.putNumber("PID out", output);
+    return output;
   }
 
   /**
