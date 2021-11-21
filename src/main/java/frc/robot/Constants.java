@@ -21,7 +21,10 @@ public final class Constants {
   public static final class DriveConstants {
 
     // Define the conventional order of our modules when putting them into arrays
-    public enum DriveModules { FrontLeft, FrontRight, RearLeft, RearRight};
+    public static final int FRONT_LEFT =0;
+    public static final int FRONT_RIGHT =1;
+    public static final int REAR_LEFT =2;
+    public static final int REAR_RIGHT =3;
 
     public static final int kPigeonPort = 20;
 

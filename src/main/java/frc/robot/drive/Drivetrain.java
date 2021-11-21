@@ -63,6 +63,8 @@ public class Drivetrain extends SubsystemBase {
           DriveConstants.CANCoder.kRearRightTurningEncoderOffset
           );
 
+  private SwerveModule[] modules = {m_frontLeft, m_frontRight, m_rearLeft, m_rearRight};
+
   // The gyro sensor
   private final Gyro m_gyro =  new ADIS16470_IMU(); // new ADXRS450_Gyro();
   // private final PigeonIMU m_pigeon = new PigeonIMU(DriveConstants.kPigeonPort);
@@ -85,15 +87,10 @@ public class Drivetrain extends SubsystemBase {
 
     m_odometry = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, getHeading());
 
-    m_frontLeft.resetDistance();
-    m_frontRight.resetDistance();
-    m_rearLeft.resetDistance();
-    m_rearRight.resetDistance();
-
-    m_frontLeft.syncTurningEncoders();
-    m_frontRight.syncTurningEncoders();
-    m_rearLeft.syncTurningEncoders();
-    m_rearRight.syncTurningEncoders();
+    for (SwerveModule module: modules) {
+      module.resetDistance();
+      module.syncTurningEncoders();
+    }
 
     m_targetPose = m_odometry.getPoseMeters();
     m_thetaController.reset();
@@ -109,8 +106,6 @@ public class Drivetrain extends SubsystemBase {
         m_frontRight.getState(),
         m_rearLeft.getState(),
         m_rearRight.getState());
-
-    SwerveModule[] modules = {m_frontLeft, m_frontRight, m_rearLeft, m_rearRight};
     
     SmartDashboard.putNumber("Heading", getHeading().getDegrees());
 
@@ -212,17 +207,17 @@ public class Drivetrain extends SubsystemBase {
 
     // Find the how fast the fastest spinning drive motor is spinning                                       
     double realMaxSpeed = 0.0;
-    for (SwerveModuleState module : desiredStates) {
-      if (Math.abs(module.speedMetersPerSecond) > realMaxSpeed) {
-        realMaxSpeed = Math.abs(module.speedMetersPerSecond);
+    for (SwerveModuleState moduleState : desiredStates) {
+      if (Math.abs(moduleState.speedMetersPerSecond) > realMaxSpeed) {
+        realMaxSpeed = Math.abs(moduleState.speedMetersPerSecond);
       }
     }
     
     double k = Math.max(Math.sqrt(x*x + y*y), Math.abs(theta));
     if (realMaxSpeed != 0.0) {
-      for (SwerveModuleState moduleState : desiredStates) {
-        moduleState.speedMetersPerSecond *= (k * maxVelocity / realMaxSpeed);
-      }
+        for (SwerveModuleState moduleState : desiredStates) {
+          moduleState.speedMetersPerSecond *= (k * maxVelocity / realMaxSpeed);
+        }
     }
   }
 
@@ -236,30 +231,28 @@ public class Drivetrain extends SubsystemBase {
     SwerveDriveKinematics.normalizeWheelSpeeds(
         desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
 
-    m_frontLeft.setDesiredState(desiredStates[0]);
-    m_frontRight.setDesiredState(desiredStates[1]);
-    m_rearLeft.setDesiredState(desiredStates[2]);
-    m_rearRight.setDesiredState(desiredStates[3]);
+        for (int i = 0; i <= 3; i++) {
+          modules[i].setDesiredState(desiredStates[i]);
+        }
   }
 
   public SwerveModuleState[] getModuleStates() {
 
-    SwerveModuleState[] states = {
-      m_frontLeft.getState(),
-      m_frontRight.getState(),
-      m_rearLeft.getState(),
-      m_rearRight.getState()
-    };
+    SwerveModuleState[] states = new SwerveModuleState[4];
+
+    for (int i = 0; i <= 3; i++) {
+      states[i++] = modules[i].getState();
+    }
 
     return states;
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
   public void resetEncoders() {
-    m_frontLeft.resetEncoders();
-    m_frontRight.resetEncoders();
-    m_rearLeft.resetEncoders();
-    m_rearRight.resetEncoders();
+
+    for (SwerveModule module: modules) {
+      module.resetEncoders();
+    }
   }
 
   /** Zeroes the heading of the robot. */
