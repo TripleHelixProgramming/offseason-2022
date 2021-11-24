@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.controller.PIDController;
 //import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 
@@ -30,6 +31,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 @SuppressWarnings("PMD.ExcessiveImports")
 public class Drivetrain extends SubsystemBase {
+
+  private Preferences prefs = Preferences.getInstance();
   // Robot swerve modules
   private final SwerveModule m_frontLeft =
       new SwerveModule(
@@ -193,7 +196,7 @@ public class Drivetrain extends SubsystemBase {
     SwerveModuleState[] swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
            
-    normalizeDrive(swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond, speeds);
+    normalizeDrive(swerveModuleStates, prefs.getDouble("kMaxSpeedMetersPerSecond",DriveConstants.kMaxSpeedMetersPerSecond), speeds);
     setModuleStates(swerveModuleStates);
   }
 
@@ -229,7 +232,7 @@ public class Drivetrain extends SubsystemBase {
   public void setModuleStates(SwerveModuleState[] desiredStates) {
 
     SwerveDriveKinematics.normalizeWheelSpeeds(
-        desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
+        desiredStates, prefs.getDouble("kMaxSpeedMetersPerSecond",DriveConstants.kMaxSpeedMetersPerSecond));
 
         for (int i = 0; i <= 3; i++) {
           modules[i].setDesiredState(desiredStates[i]);
@@ -257,8 +260,8 @@ public class Drivetrain extends SubsystemBase {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    m_gyro.calibrate();
     m_gyro.reset();
+    m_targetPose = new Pose2d(new Translation2d(), new Rotation2d());
 //    m_pigeon.setYaw(0.0);
   }
 
