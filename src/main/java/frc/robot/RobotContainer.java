@@ -14,6 +14,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.drive.Drivetrain;
 import frc.robot.drive.commands.ZeroHeading;
+import frc.robot.oi.OI;
 import frc.robot.drive.commands.JoystickDrive;
 import frc.robot.drive.commands.RelativeOrientation;
 import frc.robot.drive.commands.AbsoluteOrientation;
@@ -61,21 +62,18 @@ public class RobotContainer {
   // The robot's subsystems
   private final Drivetrain m_robotDrive = new Drivetrain();
   private final PowerDistributionPanel m_PDP = new PowerDistributionPanel(0);
+  private final OI m_OI = OI.getInstance();
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
-
-  JoystickButton xButton = new JoystickButton(m_driverController, 3);
-  JoystickButton backButton = new JoystickButton(m_driverController, 7);
-  JoystickButton startButton = new JoystickButton(m_driverController, 8);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
 
-    // Configure the button bindings
-    configureButtonBindings();
+    m_OI.setDrivetrain(m_robotDrive);
+    m_OI.configureButtonBindings();
 
     // Configure default commands
     setDefaultCommands();
@@ -100,11 +98,6 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling passing it to a
    * {@link JoystickButton}.
    */
-  private void configureButtonBindings() {
-
-    backButton.whenPressed(new ZeroHeading(m_robotDrive));
-    startButton.whenPressed(new ResetEncoders(m_robotDrive));
-  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
