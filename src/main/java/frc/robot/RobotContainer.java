@@ -62,7 +62,7 @@ public class RobotContainer {
   // The robot's subsystems
   private final Drivetrain m_robotDrive = new Drivetrain();
   private final PowerDistributionPanel m_PDP = new PowerDistributionPanel(0);
-  private final OI m_OI = OI.getInstance();
+  private final OI m_OI = new OI();
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -78,12 +78,6 @@ public class RobotContainer {
     // Configure default commands
     setDefaultCommands();
 
-    // m_robotDrive.setDefaultCommand(new RunCommand(() -> m_robotDrive.setModuleStates(new SwerveModuleState[]{
-    //   new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight) * 5, new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft))),
-    //   new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight) * 5, new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft))),
-    //   new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight) * 5, new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft))),
-    //   new SwerveModuleState(m_driverController.getY(GenericHID.Hand.kRight) * 5, new Rotation2d(Math.PI * m_driverController.getX(GenericHID.Hand.kLeft)))}),
-    //   m_robotDrive));
   }
 
   private void setDefaultCommands() {
@@ -119,7 +113,7 @@ public class RobotContainer {
             // Start at the origin facing the +X direction
             new Pose2d(0, 0, new Rotation2d(0)),
             // Pass through these two interior waypoints, making an 's' curve path
-            List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+            List.of(new Translation2d(1, 0), new Translation2d(2, 0)),
             // End 3 meters straight ahead of where we started, facing forward
             new Pose2d(3, 0, new Rotation2d(0)),
             config);

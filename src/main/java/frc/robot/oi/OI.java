@@ -12,17 +12,6 @@ import frc.robot.drive.commands.ResetEncoders;
 import frc.robot.drive.commands.ZeroHeading;
 
 public class OI {
-    private static OI INSTANCE;
-
-    /**
-     * @return retrieves the singleton instance of the Operator Interface
-     */
-    public static OI getInstance() {
-      if (INSTANCE == null) {
-        INSTANCE = new OI();
-      }
-      return INSTANCE;
-    }    
     private static final String DRIVER = "Xbox";
     private static final int DRIVER_PORT = 0;
     private static final String OPERATOR = "P";
@@ -36,12 +25,16 @@ public class OI {
     private Joystick driver;
     private Joystick operator;
 
-    private OI() {
+    public OI() {
         cp = ControllerPatroller.getPatroller();
 
         driver = cp.get(DRIVER, DRIVER_PORT);
         
         operator = cp.get(OPERATOR, OPERATOR_PORT);
+    }
+
+    public void setDrivetrain(Drivetrain dt) {
+      this.dt = dt;
     }
 
     public void configureButtonBindings() {
@@ -61,7 +54,4 @@ public class OI {
 
     }
 
-    public void setDrivetrain(Drivetrain dt) {
-      this.dt = dt;
-    }
   }
