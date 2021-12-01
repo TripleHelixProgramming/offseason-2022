@@ -75,14 +75,15 @@ public class RobotContainer {
     m_OI.setDrivetrain(m_robotDrive);
     m_OI.configureButtonBindings();
 
+    SmartDashboard.putData("Reset Encoders", new ResetEncoders(m_robotDrive));
     // Configure default commands
     setDefaultCommands();
 
   }
 
   private void setDefaultCommands() {
-    m_robotDrive.setDefaultCommand(new RelativeOrientation(m_robotDrive));
-    // m_robotDrive.setDefaultCommand(new JoystickDrive(m_robotDrive));
+    // m_robotDrive.setDefaultCommand(new RelativeOrientation(m_robotDrive));
+    m_robotDrive.setDefaultCommand(new JoystickDrive(m_robotDrive));
 
   }
 

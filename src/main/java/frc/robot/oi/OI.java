@@ -6,6 +6,7 @@ import com.team2363.utilities.ControllerMap;
 import com.team2363.utilities.ControllerPatroller;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.drive.Drivetrain;
 import frc.robot.drive.commands.ResetEncoders;
@@ -40,7 +41,9 @@ public class OI {
     public void configureButtonBindings() {
 
       new JoystickButton(driver, ControllerMap.X_BOX_LOGO_LEFT).whenPressed(new ZeroHeading(dt));
-      new JoystickButton(driver, ControllerMap.X_BOX_LOGO_RIGHT).whenPressed(new ResetEncoders(dt));
+
+      // Below moved to a button on ShuffleBoard.
+//      new JoystickButton(driver, ControllerMap.X_BOX_LOGO_RIGHT).whenPressed(new ResetEncoders(dt));
 
       new JoystickButton(driver, ControllerMap.X_BOX_A);
       new JoystickButton(driver, ControllerMap.X_BOX_B);
@@ -49,6 +52,7 @@ public class OI {
 
       // Set bindings specific to the RadioMaster TX16S controller.
       if (cp.find(RADIO_MASTER).isPresent()) {
+        SmartDashboard.putBoolean("RadioMaster Found", true);
         new JoystickButton(driver, 12).whenPressed(new ZeroHeading(dt));
       }
 
