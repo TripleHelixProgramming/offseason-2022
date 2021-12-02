@@ -15,6 +15,18 @@ import frc.robot.drive.commands.ResetEncoders;
 import frc.robot.drive.commands.ZeroHeading;
 
 public class OI {
+
+  private static OI INSTANCE = new OI();
+  /**
+   * @return retrieves the singleton instance of the Robot Container
+   */
+  public static OI getInstance() {
+    if (INSTANCE == null) {
+      INSTANCE = new OI();
+    }
+    return INSTANCE;
+  }
+
   private static final String DRIVER = "Xbox";
   private static final int DRIVER_PORT = 0;
   private static final String OPERATOR = "P";
