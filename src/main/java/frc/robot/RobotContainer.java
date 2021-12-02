@@ -4,40 +4,28 @@
 
 package frc.robot;
 
+import java.util.List;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OIConstants;
-import frc.robot.drive.Drivetrain;
-import frc.robot.drive.commands.ZeroHeading;
-import frc.robot.oi.OI;
-import frc.robot.drive.commands.JoystickDrive;
-import frc.robot.drive.commands.RelativeOrientation;
-import frc.robot.drive.commands.AbsoluteOrientation;
-import frc.robot.drive.commands.ResetEncoders;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
-import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.drive.Drivetrain;
+import frc.robot.drive.commands.JoystickDrive;
+import frc.robot.drive.commands.ResetEncoders;
+import frc.robot.oi.OI;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -64,9 +52,6 @@ public class RobotContainer {
   private final PowerDistributionPanel m_PDP = new PowerDistributionPanel(0);
   private final OI m_OI = new OI();
 
-  // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
-
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -76,6 +61,7 @@ public class RobotContainer {
     m_OI.configureButtonBindings();
 
     SmartDashboard.putData("Reset Encoders", new ResetEncoders(m_robotDrive));
+
     // Configure default commands
     setDefaultCommands();
 
@@ -84,7 +70,6 @@ public class RobotContainer {
   private void setDefaultCommands() {
     // m_robotDrive.setDefaultCommand(new RelativeOrientation(m_robotDrive));
     m_robotDrive.setDefaultCommand(new JoystickDrive(m_robotDrive));
-
   }
 
   /**
@@ -145,15 +130,17 @@ public class RobotContainer {
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(stop));
   }
 
+  // JJ: This is kind of silly. Anything that wants to get the joystick values has to getInstance() of RobotContainer,
+  // then reach in to it to get OI to get the joysticks, to get the values. 
   public double getTranslateXJoystick() {
-    return m_driverController.getY(GenericHID.Hand.kRight);
+    return m_OI.getDriverJoystick().getY(GenericHID.Hand.kRight);
   }
 
   public double getTranslateYJoystick() {
-    return m_driverController.getX(GenericHID.Hand.kRight);
+    return m_OI.getDriverJoystick().getX(GenericHID.Hand.kRight);
   }
 
   public double getRotateJoystick() {
-    return m_driverController.getX(GenericHID.Hand.kLeft);
+    return m_OI.getDriverJoystick().getX(GenericHID.Hand.kLeft);
   }
 }

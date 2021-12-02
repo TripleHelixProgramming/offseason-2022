@@ -4,6 +4,7 @@
 
 package frc.robot.drive.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.drive.Drivetrain;
 
@@ -27,6 +28,7 @@ public class ZeroHeading extends CommandBase {
       
     @Override
     public void execute() {
+        SmartDashboard.putString("Zero Heading", "Resetting Heading");
         drivetrain.zeroHeading();
     }
       
