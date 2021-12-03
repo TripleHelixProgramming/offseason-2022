@@ -68,6 +68,7 @@ public class Robot extends TimedRobot {
       // SmartDashboard.putBoolean("Controllers Changed",true);
       // Reset the button mappings.
       CommandScheduler.getInstance().clearButtons();
+      OI.getInstance().configureJoysticks();
       OI.getInstance().configureButtonBindings();
     }
   }

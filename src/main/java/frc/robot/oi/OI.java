@@ -41,15 +41,7 @@ public class OI {
   private Joystick operator;
 
   public OI() {
-    cp = ControllerPatroller.getPatroller();
-
-    // Driver controller will be RadioMaster, XBox, or whatever is plugged into
-    // DRIVER_PORT
-    Optional<Joystick> rmJoystick = cp.find(RADIO_MASTER);
-    driver = rmJoystick.isPresent() ? rmJoystick.get() : cp.get(DRIVER, DRIVER_PORT);
-
-    // Operator Joystick is PS4 controller or whatever is plugged into OPERATOR_PORT
-    operator = cp.get(OPERATOR, OPERATOR_PORT);
+    configureJoysticks();
   }
 
   public void setDrivetrain(Drivetrain dt) {
@@ -64,6 +56,21 @@ public class OI {
     return operator;
   }
 
+  public void configureJoysticks() {
+    cp = ControllerPatroller.getPatroller();
+
+    // Driver controller will be RadioMaster, XBox, or whatever is plugged into
+    // DRIVER_PORT
+    Optional<Joystick> rmJoystick = cp.find(RADIO_MASTER);
+    driver = rmJoystick.isPresent() ? rmJoystick.get() : cp.get(DRIVER, DRIVER_PORT);
+
+    // Operator Joystick is PS4 controller or whatever is plugged into OPERATOR_PORT
+    operator = cp.get(OPERATOR, OPERATOR_PORT);
+  }
+
+  /**
+   * Be sure Drivetrain is set before calling this!
+   */
   public void configureButtonBindings() {
 
     SmartDashboard.putString("Driver Joystick", driver.getName());
