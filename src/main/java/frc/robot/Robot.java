@@ -63,11 +63,9 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {
     // Scan the USB devices. If they change, remap the buttons.
-    ControllerPatroller cp = ControllerPatroller.getPatroller();
-    if (cp.controllersChanged()) {
+    if (ControllerPatroller.getPatroller().controllersChanged()) {
       // SmartDashboard.putBoolean("Controllers Changed",true);
-      // Reset the button mappings.
-      CommandScheduler.getInstance().clearButtons();
+      // Reset the joysticks & button mappings.
       OI.getInstance().configureJoysticks();
       OI.getInstance().configureButtonBindings();
     }

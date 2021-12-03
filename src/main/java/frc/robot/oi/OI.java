@@ -9,6 +9,7 @@ import com.team2363.utilities.ControllerPatroller;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.drive.Drivetrain;
 import frc.robot.drive.commands.ResetEncoders;
@@ -72,6 +73,7 @@ public class OI {
    * Be sure Drivetrain is set before calling this!
    */
   public void configureButtonBindings() {
+    CommandScheduler.getInstance().clearButtons();
 
     SmartDashboard.putString("Driver Joystick", driver.getName());
     if (driver.getName().contains(RADIO_MASTER)) {
