@@ -4,8 +4,11 @@
 
 package frc.robot;
 
+import com.team2363.utilities.ControllerPatroller;
+
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -57,7 +60,13 @@ public class Robot extends TimedRobot {
   public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    // Scan the USB devices. If they change, remap the buttons.
+    ControllerPatroller cp = ControllerPatroller.getPatroller();
+    if (cp.controllersChanged()) {
+      SmartDashboard.putBoolean("Controllers Changed",true);
+    }
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
