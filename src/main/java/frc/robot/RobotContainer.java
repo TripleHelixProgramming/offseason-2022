@@ -50,7 +50,7 @@ public class RobotContainer {
   // The robot's subsystems
   private final Drivetrain m_robotDrive = new Drivetrain();
   private final PowerDistributionPanel m_PDP = new PowerDistributionPanel(0);
-  private final OI m_OI = new OI();
+  private final OI m_OI = OI.getInstance();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
