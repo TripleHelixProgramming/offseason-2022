@@ -133,14 +133,17 @@ public class RobotContainer {
   // JJ: This is kind of silly. Anything that wants to get the joystick values has to getInstance() of RobotContainer,
   // then reach in to it to get OI to get the joysticks, to get the values. 
   public double getTranslateXJoystick() {
-    return m_OI.getDriverJoystick().getY(GenericHID.Hand.kRight);
+    // return m_OI.getDriverJoystick().getY(GenericHID.Hand.kRight);
+    return m_OI.getDriverJoystick().getRawAxis(5);
   }
 
   public double getTranslateYJoystick() {
-    return m_OI.getDriverJoystick().getX(GenericHID.Hand.kRight);
+    // return m_OI.getDriverJoystick().getX(GenericHID.Hand.kRight);
+    return m_OI.getDriverJoystick().getRawAxis(4);
   }
 
   public double getRotateJoystick() {
-    return m_OI.getDriverJoystick().getX(GenericHID.Hand.kLeft);
+//    return m_OI.getDriverJoystick().getX(GenericHID.Hand.kLeft);
+    return m_OI.getDriverJoystick().getRawAxis(0);
   }
 }
