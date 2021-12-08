@@ -4,6 +4,8 @@
 
 package frc.robot.drive.commands;
 
+import com.team2363.utilities.ControllerMap;
+
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotContainer;
@@ -26,7 +28,7 @@ public class RelativeOrientation extends JoystickDrive {
 
     @Override
     public double getTheta() {
-        double thetaRaw = RobotContainer.getInstance().getRotateJoystick();
+        double thetaRaw = m_OI.getDriverJoystick().getRawAxis(ControllerMap.X_BOX_LEFT_STICK_X);
         double thetaTreated = joyMap.calculateMappedVal(thetaRaw);
         Rotation2d deltaTheta = new Rotation2d(thetaTreated);
         drivetrain.rotateRelative(deltaTheta);

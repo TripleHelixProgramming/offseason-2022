@@ -7,6 +7,9 @@ package frc.robot.drive.commands;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotContainer;
 import frc.robot.drive.Drivetrain;
+import frc.robot.oi.OI;
+
+import com.team2363.utilities.ControllerMap;
 
 import frc.lib.Curve;
 import frc.lib.LinCurve;
@@ -19,25 +22,27 @@ public class JoystickDrive extends Drive {
     double thetaJoyScale = DriveConstants.kMaxRotationalVelocity;
     Curve thetaJoyMap = new LinCurve(0.0, thetaJoyScale, 0.4);
 
+    OI m_OI = OI.getInstance();
+
     public JoystickDrive(Drivetrain subsystem){
         super(subsystem);
     }
  
     @Override
     public double getX() {
-        double xRaw = RobotContainer.getInstance().getTranslateXJoystick();
+        double xRaw = m_OI.getDriverJoystick().getRawAxis(ControllerMap.X_BOX_RIGHT_STICK_Y);
         return xyJoyMap.calculateMappedVal(xRaw);
     }
 
     @Override
     public double getY() {
-        double yRaw = RobotContainer.getInstance().getTranslateYJoystick();
+        double yRaw = m_OI.getDriverJoystick().getRawAxis(ControllerMap.X_BOX_RIGHT_STICK_X);
         return xyJoyMap.calculateMappedVal(yRaw);
     }
 
     @Override
     public double getTheta() {
-        double thetaRaw = RobotContainer.getInstance().getRotateJoystick();
+        double thetaRaw = m_OI.getDriverJoystick().getRawAxis(ControllerMap.X_BOX_LEFT_STICK_X);
         return thetaJoyMap.calculateMappedVal(thetaRaw);
     }
 
