@@ -28,7 +28,7 @@ public class RelativeOrientation extends JoystickDrive {
 
     @Override
     public double getTheta() {
-        double thetaRaw = m_OI.getDriverJoystick().getRawAxis(ControllerMap.X_BOX_LEFT_STICK_X);
+        double thetaRaw = m_OI.getRotation();
         double thetaTreated = joyMap.calculateMappedVal(thetaRaw);
         Rotation2d deltaTheta = new Rotation2d(thetaTreated);
         drivetrain.rotateRelative(deltaTheta);

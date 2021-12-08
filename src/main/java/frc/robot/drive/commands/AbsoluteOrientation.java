@@ -4,10 +4,7 @@
 
 package frc.robot.drive.commands;
 
-import com.team2363.utilities.ControllerMap;
-
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import frc.robot.RobotContainer;
 import frc.robot.drive.Drivetrain;
 
 public class AbsoluteOrientation extends JoystickDrive {
@@ -18,7 +15,7 @@ public class AbsoluteOrientation extends JoystickDrive {
 
     @Override
     public double getTheta() {
-        double thetaRaw = m_OI.getDriverJoystick().getRawAxis(ControllerMap.X_BOX_LEFT_STICK_X);
+        double thetaRaw = m_OI.getRotation();
         Rotation2d theta = Rotation2d.fromDegrees(thetaRaw * 180.0);
         drivetrain.rotateAbsolute(theta);
         return drivetrain.getThetaDot();
