@@ -4,11 +4,8 @@
 
 package frc.robot.drive.commands;
 
-import com.team2363.utilities.ControllerMap;
-
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.RobotContainer;
 import frc.robot.drive.Drivetrain;
 
 import frc.lib.Curve;
