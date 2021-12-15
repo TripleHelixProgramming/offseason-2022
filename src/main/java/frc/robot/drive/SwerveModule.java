@@ -129,16 +129,22 @@ public class SwerveModule extends SubsystemBase {
 
         Rotation2d curAngle = Rotation2d.fromDegrees(m_turningEncoder.getPosition());
 
-        adjustedAngle = Rotation2d.fromDegrees(calculateAdjustedAngle(state.angle.getDegrees(), curAngle.getDegrees()));
+        double delta = deltaAdjustedAngle(state.angle.getDegrees(), curAngle.getDegrees());
+
+        // Calculate the drive motor output from the drive PID controller.
+        double driveOutput = state.speedMetersPerSecond;
+
+        if (Math.abs(delta) > 90) {
+            driveOutput *= -1;
+            delta -= Math.signum(delta) * 180;
+        }
+
+        adjustedAngle = Rotation2d.fromDegrees(delta + curAngle.getDegrees());
 
         m_turningController.setReference(
             adjustedAngle.getDegrees(),
             ControlType.kPosition
         );        
-
-        // Calculate the drive motor output from the drive PID controller.
-        final var driveOutput = state.speedMetersPerSecond; 
-        // m_driveMotor.set(driveOutput);
 
         SmartDashboard.putNumber("Commanded Velocity", driveOutput);
 
@@ -147,21 +153,9 @@ public class SwerveModule extends SubsystemBase {
 
     //calculate the angle motor setpoint based on the desired angle and the current angle measurement
     // Arguments are in radians.
-    public double calculateAdjustedAngle(double targetAngle, double currentAngle) {
+    public double deltaAdjustedAngle(double targetAngle, double currentAngle) {
 
-        // double modAngle = currentAngle % (360);
-
-        // if (modAngle < 0.0) modAngle += 360;
-        
-        // double newTarget = targetAngle + currentAngle - modAngle;
-
-        // if (targetAngle - modAngle > 180) newTarget -= 360;
-        // else if (targetAngle - modAngle < -180) newTarget += 360;
-
-        // return newTarget;
-
-        return ((targetAngle - currentAngle + 180) % 360 + 360) % 360 - 180 + currentAngle;
-
+        return ((targetAngle - currentAngle + 180) % 360 + 360) % 360 - 180;
     }
 
     public double getDriveDistanceMeters() {

@@ -4,6 +4,9 @@
 
 package frc.robot.drive.commands;
 
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.drive.Drivetrain;
@@ -30,6 +33,7 @@ public class ZeroHeading extends CommandBase {
     public void execute() {
         SmartDashboard.putString("Zero Heading", "Resetting Heading");
         drivetrain.zeroHeading();
+        drivetrain.resetOdometry(new Pose2d(new Translation2d(0,0),new Rotation2d(0)));
     }
       
     @Override

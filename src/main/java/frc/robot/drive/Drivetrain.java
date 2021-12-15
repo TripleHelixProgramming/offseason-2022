@@ -106,22 +106,21 @@ public class Drivetrain extends SubsystemBase {
         m_rearRight.getState());
     
     SmartDashboard.putNumber("Heading", getHeading().getDegrees());
-
-    // SmartDashboard.putNumber("FrontLeft State Raw Reading", modules[0].getTurnEncoder().getPosition());
-    // SmartDashboard.putNumber("FrontLeft Adjusted Angle", modules[0].adjustedAngle.getDegrees());
     
-    SmartDashboard.putNumber("FrontLeft State Velocity", modules[0].getState().speedMetersPerSecond);
-    SmartDashboard.putNumber("FrontLeft State Angle", modules[0].getState().angle.getDegrees());
+    // SmartDashboard.putNumber("FrontLeft State Velocity", modules[0].getState().speedMetersPerSecond);
+    // SmartDashboard.putNumber("FrontLeft State Angle", modules[0].getState().angle.getDegrees());
 
-    SmartDashboard.putNumber("FrontRight Velocity", modules[1].getState().speedMetersPerSecond);
-    SmartDashboard.putNumber("FrontRight Angle", modules[1].getState().angle.getDegrees());
+    // SmartDashboard.putNumber("FrontRight Velocity", modules[1].getState().speedMetersPerSecond);
+    // SmartDashboard.putNumber("FrontRight Angle", modules[1].getState().angle.getDegrees());
 
-    SmartDashboard.putNumber("RearLeft Velocity", modules[2].getState().speedMetersPerSecond);
-    SmartDashboard.putNumber("RearLeft Angle", modules[2].getState().angle.getDegrees());
+    // SmartDashboard.putNumber("RearLeft Velocity", modules[2].getState().speedMetersPerSecond);
+    // SmartDashboard.putNumber("RearLeft Angle", modules[2].getState().angle.getDegrees());
 
-    SmartDashboard.putNumber("RearRight Velocity", modules[3].getState().speedMetersPerSecond);
-    SmartDashboard.putNumber("RearRight Angle", modules[3].getState().angle.getDegrees());
+    // SmartDashboard.putNumber("RearRight Velocity", modules[3].getState().speedMetersPerSecond);
+    // SmartDashboard.putNumber("RearRight Angle", modules[3].getState().angle.getDegrees());
     
+    SmartDashboard.putNumber("currentX", getPose().getX());
+    SmartDashboard.putNumber("currentY", getPose().getY());
     SmartDashboard.putNumber("currentAngle", getPose().getRotation().getRadians());
     SmartDashboard.putNumber("targetPoseAngle", m_targetPose.getRotation().getRadians());
 
@@ -184,24 +183,35 @@ public class Drivetrain extends SubsystemBase {
    * @param speeds ChassisSpeeds object with the desired chassis speeds [m/s and rad/s].
    */
   @SuppressWarnings("ParameterName")
-  public void drive(ChassisSpeeds speeds) {
+  public void drive(ChassisSpeeds speeds, ChassisSpeeds percents) {
+
+    if (speeds.vxMetersPerSecond == 0 && speeds.vyMetersPerSecond == 0 && speeds.omegaRadiansPerSecond == 0) {
+      brake();
+      return;
+    }
 
     //double xDot, double yDot, double thetaDot, boolean fieldRelative
     
     SwerveModuleState[] swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
            
-    normalizeDrive(swerveModuleStates, prefs.getDouble("kMaxSpeedMetersPerSecond",DriveConstants.kMaxSpeedMetersPerSecond), speeds);
+    normalizeDrive(swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond, percents);
     setModuleStates(swerveModuleStates);
+  }
+
+  public void brake() {
+    for (SwerveModule module : modules) {
+      module.setDesiredState(new SwerveModuleState(0, module.getState().angle));
+    }
   }
 
   public void normalizeDrive(SwerveModuleState[] desiredStates, 
                                       double maxVelocity,
-                                      ChassisSpeeds speeds) {
+                                      ChassisSpeeds percents) {
 
-    double x = speeds.vxMetersPerSecond;
-    double y = speeds.vyMetersPerSecond;
-    double theta = speeds.omegaRadiansPerSecond;
+    double x = percents.vxMetersPerSecond;
+    double y = percents.vyMetersPerSecond;
+    double theta = percents.omegaRadiansPerSecond;
 
     // Find the how fast the fastest spinning drive motor is spinning                                       
     double realMaxSpeed = 0.0;
@@ -211,7 +221,7 @@ public class Drivetrain extends SubsystemBase {
       }
     }
     
-    double k = Math.max(Math.sqrt(x*x + y*y), Math.abs(theta));
+    double k = Math.max(Math.hypot(x, y), Math.abs(theta));
     if (realMaxSpeed != 0.0) {
         for (SwerveModuleState moduleState : desiredStates) {
           moduleState.speedMetersPerSecond *= (k * maxVelocity / realMaxSpeed);
