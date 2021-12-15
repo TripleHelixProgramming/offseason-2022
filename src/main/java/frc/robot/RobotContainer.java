@@ -128,7 +128,6 @@ public class RobotContainer {
     m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
 
     // Run path following command, then stop at the end.
-    ChassisSpeeds stop = new ChassisSpeeds(0.0, 0.0, 0.0);
-    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(stop));
+    return swerveControllerCommand.andThen(() -> m_robotDrive.brake());
   }
 }
