@@ -4,12 +4,8 @@
 
 package frc.robot.drive.commands;
 
-import frc.robot.Constants.DriveConstants;
-import frc.robot.RobotContainer;
 import frc.robot.drive.Drivetrain;
 import frc.robot.oi.OI;
-
-import com.team2363.utilities.ControllerMap;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.Curve;
@@ -28,21 +24,21 @@ public class JoystickDrive extends Drive {
  
     @Override
     public double getX() {
-        double xRaw = m_OI.getDriverJoystick().getRawAxis(ControllerMap.X_BOX_RIGHT_STICK_Y);
+        double xRaw = m_OI.getTranslateX();
         SmartDashboard.putNumber("JoystickX",  xyJoyMap.calculateMappedVal(xRaw));
         return xyJoyMap.calculateMappedVal(xRaw);
     }
 
     @Override
     public double getY() {
-        double yRaw = m_OI.getDriverJoystick().getRawAxis(ControllerMap.X_BOX_RIGHT_STICK_X);
+        double yRaw = m_OI.getTranslateY();
         SmartDashboard.putNumber("JoystickY",  xyJoyMap.calculateMappedVal(yRaw));
         return xyJoyMap.calculateMappedVal(yRaw);
     }
 
     @Override
     public double getTheta() {
-        double thetaRaw = m_OI.getDriverJoystick().getRawAxis(ControllerMap.X_BOX_LEFT_STICK_X);
+        double thetaRaw = m_OI.getRotation();
         SmartDashboard.putNumber("JoystickTheta",  xyJoyMap.calculateMappedVal(thetaRaw));
         return thetaJoyMap.calculateMappedVal(thetaRaw);
     }

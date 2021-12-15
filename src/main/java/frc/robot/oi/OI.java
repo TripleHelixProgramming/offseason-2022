@@ -92,4 +92,16 @@ public class OI {
 
   }
 
+  public double getTranslateX() {
+    return driver.getRawAxis(ControllerMap.X_BOX_RIGHT_STICK_Y);
+  }
+
+  public double getTranslateY() {
+    return driver.getRawAxis(ControllerMap.X_BOX_RIGHT_STICK_X);
+  }
+
+  public double getRotation() {
+    return driver.getRawAxis(ControllerMap.X_BOX_LEFT_STICK_X);
+  }
+
 }
