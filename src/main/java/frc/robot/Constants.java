@@ -123,14 +123,14 @@ public final class Constants {
 
     // public static final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(0.254, 0.137);
     
-    public static final double kWheelDiameterMeters = 0.09398; // 3.7 in
+    public static final double kWheelDiameterMeters = 0.0762; // 3 in
 
     // The drive encoder reports in RPM by default. Calculate the conversion factor
     // to make it report in meters per second.
-    public static final double kDriveGearRatio = 6.75;
+    public static final double kDriveGearRatio = 5.5;
     public static final double kDriveConversionFactor = (kWheelDiameterMeters * Math.PI) / kDriveGearRatio;
 
-    public static final double kTurnPositionConversionFactor = 12.8;
+    public static final double kTurnPositionConversionFactor = 53.14;
   }
 
   public static final class OIConstants {
