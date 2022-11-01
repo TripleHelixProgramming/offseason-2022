@@ -4,9 +4,6 @@
 
 package frc.robot.drive;
 
-import com.ctre.phoenix.sensors.AbsoluteSensorRange;
-import com.ctre.phoenix.sensors.CANCoder;
-
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
@@ -14,6 +11,8 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.ControlType;
 
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -29,7 +28,8 @@ public class SwerveModule extends SubsystemBase {
     private final CANEncoder m_driveEncoder;
     private final CANEncoder m_turningEncoder;
 
-    private final CANCoder m_turningCANCoder;
+    private final DutyCycleEncoder m_throughBoreEncoder;
+    
 
     // absolute offset for the CANCoder so that the wheels can be aligned when the
     // robot is turned on
@@ -56,9 +56,9 @@ public class SwerveModule extends SubsystemBase {
         m_driveEncoder = m_driveMotor.getEncoder();
         m_turningEncoder = m_turningMotor.getEncoder();
 
-        m_turningCANCoder = new CANCoder(turningCANCoderChannel);
-        m_turningCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
-        m_turningCANCoder.setPosition(0);
+        m_throughBoreEncoder = new DutyCycleEncoder(turningCANCoderChannel);
+        //m_throughBoreEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+        //m_throughBoreEncoder.setPosition(0);
         
         m_CANCoderOffset = Rotation2d.fromDegrees(turningCANCoderOffsetDegrees);
 
@@ -109,12 +109,12 @@ public class SwerveModule extends SubsystemBase {
         return m_turningEncoder;
     }
 
-    public CANCoder getTurnCANcoder() {
-        return m_turningCANCoder;
+    public DutyCycleEncoder getTurnCANcoder() {
+        return m_throughBoreEncoder;
     }
 
     public double getTurnCANcoderAngle() {
-        return m_turningCANCoder.getAbsolutePosition();
+        return m_throughBoreEncoder.getAbsolutePosition();
     }
 
     public Rotation2d adjustedAngle = new Rotation2d();
@@ -167,7 +167,7 @@ public class SwerveModule extends SubsystemBase {
     }
 
     public void syncTurningEncoders() {
-        m_turningEncoder.setPosition(m_turningCANCoder.getAbsolutePosition());
+        m_turningEncoder.setPosition(m_throughBoreEncoder.getAbsolutePosition());
     }
 
     /** Zeros all the SwerveModule encoders. */
@@ -175,7 +175,7 @@ public class SwerveModule extends SubsystemBase {
         // Reset the cumulative rotation counts of the SparkMax motors
         m_turningEncoder.setPosition(0.0);
 
-        m_turningCANCoder.setPosition(0.0);
-        m_turningCANCoder.configMagnetOffset(m_turningCANCoder.configGetMagnetOffset() - m_turningCANCoder.getAbsolutePosition());
+        m_throughBoreEncoder.setPosition(0.0);
+        m_throughBoreEncoder.configMagnetOffset(m_throughBoreEncoder.configGetMagnetOffset() - m_turningCANCoder.getAbsolutePosition());
     }
 }
