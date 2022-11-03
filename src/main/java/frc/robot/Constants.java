@@ -6,7 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -17,46 +17,43 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  public static final class ElectricalConstants {
+      public static final ModuleType pdpType = ModuleType.kCTRE;
+      public static final int pdpPort = 0;
 
-  public static final class DriveConstants {
+      //port #s for the encoders
+      public static final int kRearRightTurningEncoderPort = 31;
+      public static final int kFrontRightTurningEncoderPort = 33;
+      public static final int kFrontLeftTurningEncoderPort = 43;
+      public static final int kRearLeftTurningEncoderPort = 45;
 
-    // Define the conventional order of our modules when putting them into arrays
-    public static final int FRONT_LEFT =0;
-    public static final int FRONT_RIGHT =1;
-    public static final int REAR_LEFT =2;
-    public static final int REAR_RIGHT =3;
-
-    public static final int kPigeonPort = 20;
-
-    public static final class SparkCAN {
+      //port #s for the drive motors
       public static final int kRearRightDriveMotorPort = 10;
       public static final int kFrontRightDriveMotorPort = 12;
       public static final int kFrontLeftDriveMotorPort = 22;
       public static final int kRearLeftDriveMotorPort = 24;
   
+      //port #s for the turning motors
       public static final int kRearRightTurningMotorPort = 11;  
       public static final int kFrontRightTurningMotorPort = 13;
       public static final int kFrontLeftTurningMotorPort = 23;
       public static final int kRearLeftTurningMotorPort = 25;
-    }
 
-    public static final class CANCoder {
-      // Below provided by SparkMAX motors API.
-      // public static final int kFrontLeftDriveEncoderPort = 
-      // public static final int kRearLeftDriveEncoderPort =
-      // public static final int kFrontRightDriveEncoderPort =
-      // public static final int kRearRightDriveEncoderPort =
+      public static final int kGyroPort = 20;
+  }
 
-      public static final int kRearRightTurningEncoderPort = 31;
-      public static final int kFrontRightTurningEncoderPort = 33;
-      public static final int kFrontLefTurningEncoderPort = 43;
-      public static final int kRearLeftTurningEncoderPort = 45;
+  public static final class DriveConstants {
 
-      public static final double kRearRightTurningEncoderOffset = 180.0;
-      public static final double kFrontRightTurningEncoderOffset = 180.0;
-      public static final double kFrontLefTurningEncoderOffset = 180.0;
-      public static final double kRearLeftTurningEncoderOffset = 180.0;
-    }
+    // Define the conventional order of our modules when putting them into arrays
+    public static final int FRONT_LEFT = 0;
+    public static final int FRONT_RIGHT = 1;
+    public static final int REAR_LEFT = 2;
+    public static final int REAR_RIGHT = 3;
+    
+    public static final double kRearRightTurningEncoderOffset = 180.0;
+    public static final double kFrontRightTurningEncoderOffset = 180.0;
+    public static final double kFrontLeftTurningEncoderOffset = 180.0;
+    public static final double kRearLeftTurningEncoderOffset = 180.0;
 
     public static final boolean kFrontLeftDriveEncoderReversed = false;
     public static final boolean kFrontRightDriveEncoderReversed = false;
@@ -135,21 +132,5 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
-  }
-
-  public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 3.0;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3.0;
-    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
-
-    public static final double kPXController = 1.0;
-    public static final double kPYController = 1.0;
-    public static final double kPThetaController = 1.0;
-
-    // Constraint for the motion profilied robot angle controller
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
-        new TrapezoidProfile.Constraints(
-            kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
   }
 }
