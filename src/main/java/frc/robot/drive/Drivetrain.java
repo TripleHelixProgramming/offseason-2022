@@ -4,25 +4,23 @@
 
 package frc.robot.drive;
 
-import com.analog.adis16470.frc.ADIS16470_IMU;
+import com.kauailabs.navx.frc.AHRS;
 
-import edu.wpi.first.wpilibj.Preferences;
-import edu.wpi.first.math.controller.PIDController;
-//import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-// import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-// import com.ctre.phoenix.sensors.PigeonIMU;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.Preferences;
+
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.ElectricalConstants;
 
 @SuppressWarnings("PMD.ExcessiveImports")
 public class Drivetrain extends SubsystemBase {
@@ -31,57 +29,52 @@ public class Drivetrain extends SubsystemBase {
   // Robot swerve modules
   private final SwerveModule m_frontLeft =
       new SwerveModule(
-          DriveConstants.SparkCAN.kFrontLeftDriveMotorPort,
-          DriveConstants.SparkCAN.kFrontLeftTurningMotorPort,
-          DriveConstants.CANCoder.kFrontLefTurningEncoderPort,
-          DriveConstants.CANCoder.kFrontLefTurningEncoderOffset
+          ElectricalConstants.kFrontLeftDriveMotorPort,
+          ElectricalConstants.kFrontLeftTurningMotorPort,
+          ElectricalConstants.kFrontLeftTurningEncoderPort,
+          DriveConstants.kFrontLeftTurningEncoderOffset
           );
 
   private final SwerveModule m_frontRight =
       new SwerveModule(
-          DriveConstants.SparkCAN.kFrontRightDriveMotorPort,
-          DriveConstants.SparkCAN.kFrontRightTurningMotorPort,
-          DriveConstants.CANCoder.kFrontRightTurningEncoderPort,
-          DriveConstants.CANCoder.kFrontRightTurningEncoderOffset
+          ElectricalConstants.kFrontRightDriveMotorPort,
+          ElectricalConstants.kFrontRightTurningMotorPort,
+          ElectricalConstants.kFrontRightTurningEncoderPort,
+          DriveConstants.kFrontRightTurningEncoderOffset
           );
 
   private final SwerveModule m_rearLeft =
       new SwerveModule(
-          DriveConstants.SparkCAN.kRearLeftDriveMotorPort,
-          DriveConstants.SparkCAN.kRearLeftTurningMotorPort,
-          DriveConstants.CANCoder.kRearLeftTurningEncoderPort,
-          DriveConstants.CANCoder.kRearLeftTurningEncoderOffset
+          ElectricalConstants.kRearLeftDriveMotorPort,
+          ElectricalConstants.kRearLeftTurningMotorPort,
+          ElectricalConstants.kRearLeftTurningEncoderPort,
+          DriveConstants.kRearLeftTurningEncoderOffset
           );
 
   private final SwerveModule m_rearRight =
       new SwerveModule(
-          DriveConstants.SparkCAN.kRearRightDriveMotorPort,
-          DriveConstants.SparkCAN.kRearRightTurningMotorPort,
-          DriveConstants.CANCoder.kRearRightTurningEncoderPort,
-          DriveConstants.CANCoder.kRearRightTurningEncoderOffset
+          ElectricalConstants.kRearRightDriveMotorPort,
+          ElectricalConstants.kRearRightTurningMotorPort,
+          ElectricalConstants.kRearRightTurningEncoderPort,
+          DriveConstants.kRearRightTurningEncoderOffset
           );
 
   private SwerveModule[] modules = {m_frontLeft, m_frontRight, m_rearLeft, m_rearRight};
 
   // The gyro sensor
-  private final Gyro m_gyro =  new ADIS16470_IMU(); // new ADXRS450_Gyro();
-  // private final PigeonIMU m_pigeon = new PigeonIMU(DriveConstants.kPigeonPort);
+  private final AHRS m_ahrs = new AHRS();
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry;
 
   //target pose and controller
   Pose2d m_targetPose;
-  PIDController m_thetaController = new PIDController(1.0, 0.0, 0.05);
-  //ProfiledPIDController m_thetaController = new ProfiledPIDController(
-  //  AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
     
   /** Creates a new DriveSubsystem. */
   public Drivetrain() {
 
     // Zero out the gyro.
-    m_gyro.calibrate();
-    m_gyro.reset();
+    m_ahrs.zeroYaw();
 
     m_odometry = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, getHeading());
 
@@ -89,10 +82,6 @@ public class Drivetrain extends SubsystemBase {
       module.resetDistance();
       module.syncTurningEncoders();
     }
-
-    m_targetPose = m_odometry.getPoseMeters();
-    m_thetaController.reset();
-    m_thetaController.enableContinuousInput(-Math.PI, Math.PI);
   }
 
   @Override
@@ -157,27 +146,6 @@ public class Drivetrain extends SubsystemBase {
   }
 
   /**
-   * Method to set the absolute orientation of the target pose.
-   *
-   * @param theta The target orientation.
-   */
-  public void rotateAbsolute(Rotation2d theta) {
-    m_targetPose = new Pose2d(new Translation2d(), theta);
-  }
-
-  /**
-   * Method to get the output of the chassis orientation PID controller.
-   *
-   */
-  public double getThetaDot() {
-    double setpoint = m_targetPose.getRotation().getRadians();
-    double measurement = getPose().getRotation().getRadians();
-    double output = m_thetaController.calculate(measurement, setpoint);
-    SmartDashboard.putNumber("PID out", output);
-    return output;
-  }
-
-  /**
    * Method to drive the robot with given velocities.
    *
    * @param speeds ChassisSpeeds object with the desired chassis speeds [m/s and rad/s].
@@ -235,8 +203,7 @@ public class Drivetrain extends SubsystemBase {
    * @param desiredStates The desired SwerveModule states.
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
-
-    SwerveDriveKinematics.normalizeWheelSpeeds(
+    SwerveDriveKinematics.desaturateWheelSpeeds(
         desiredStates, prefs.getDouble("kMaxSpeedMetersPerSecond",DriveConstants.kMaxSpeedMetersPerSecond));
 
         for (int i = 0; i <= 3; i++) {
@@ -245,7 +212,6 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public SwerveModuleState[] getModuleStates() {
-
     SwerveModuleState[] states = new SwerveModuleState[4];
 
     for (int i = 0; i <= 3; i++) {
@@ -257,17 +223,15 @@ public class Drivetrain extends SubsystemBase {
 
   /** Resets the drive encoders to currently read a position of 0. */
   public void resetEncoders() {
-
     for (SwerveModule module: modules) {
-      module.resetEncoders();
+      module.resetDistance();
     }
   }
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    m_gyro.reset();
+    m_ahrs.zeroYaw();
     m_targetPose = new Pose2d(new Translation2d(), new Rotation2d());
-//    m_pigeon.setYaw(0.0);
   }
 
   /**
@@ -276,19 +240,6 @@ public class Drivetrain extends SubsystemBase {
    * @return the robot's heading as a Rotation2d
    */
   public Rotation2d getHeading() {
-    return m_gyro.getRotation2d();
-    // double[] ypr_deg = {0.0, 0.0, 0.0};
-    // m_pigeon.getYawPitchRoll(ypr_deg);
-    // return new Rotation2d(Math.toRadians(ypr_deg[0]));
-  }
-
-
-  /**
-   * Returns the turn rate of the robot.
-   *
-   * @return The turn rate of the robot, in degrees per second
-   */
-  public double getTurnRate() {
-    return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+    return m_ahrs.getRotation2d();
   }
 }
