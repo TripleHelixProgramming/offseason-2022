@@ -47,10 +47,13 @@ public final class Constants {
       // public static final int kFrontRightDriveEncoderPort =
       // public static final int kRearRightDriveEncoderPort =
 
-      public static final int kRearRightTurningEncoderPort = 31;
-      public static final int kFrontRightTurningEncoderPort = 33;
-      public static final int kFrontLefTurningEncoderPort = 43;
-      public static final int kRearLeftTurningEncoderPort = 45;
+
+      //DIO ports
+      public static final int kRearRightTurningEncoderPort =  0;
+      public static final int kFrontRightTurningEncoderPort = 1;
+      public static final int kFrontLefTurningEncoderPort =  2;
+      public static final int kRearLeftTurningEncoderPort =  3;
+      
 
       public static final double kRearRightTurningEncoderOffset = 180.0;
       public static final double kFrontRightTurningEncoderOffset = 180.0;
