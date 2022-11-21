@@ -128,12 +128,18 @@ public final class Constants {
     
     public static final double kWheelDiameterMeters = 0.0762; // 3 in
 
+    // Gear reduction (unitless) between the drive motor and the wheel
+    public static final double kDriveGearRatio = 5.5;
+    
     // The drive encoder reports in RPM by default. Calculate the conversion factor
     // to make it report in meters per second.
-    public static final double kDriveGearRatio = 5.5;
     public static final double kDriveConversionFactor = (kWheelDiameterMeters * Math.PI) / kDriveGearRatio;
 
-    public static final double kTurnPositionConversionFactor = 53.14;
+    // Gear reduction (unitless) between the steering motor and the module azimuth
+    // Stage 1 - REV Ultraplanetary nominal "4:1" stage, actual ratio 29:84
+    // Stage 2 - REV Ultraplanetary nominal "3:1" stage, actual ratio 21:76
+    // Stage 3 - 14:62
+    public static final double kTurnPositionConversionFactor = 46.42;
   }
 
   public static final class OIConstants {
