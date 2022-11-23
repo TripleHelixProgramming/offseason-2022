@@ -34,7 +34,9 @@ public class SwerveModule extends SubsystemBase {
     private final Rotation2d m_EncoderOffset;
 
     private final SparkMaxPIDController m_turningController;
-    private final SparkMaxPIDController m_driveController;    
+    private final SparkMaxPIDController m_driveController; 
+    
+    private final int turningChannel;
 
     /**
      * Constructs a SwerveModule.
@@ -47,6 +49,7 @@ public class SwerveModule extends SubsystemBase {
                         int turningMotorChannel,
                         int turningCANCoderChannel,
                         double turningCANCoderOffsetDegrees) {
+        turningChannel = turningMotorChannel;
 
         m_driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
         m_turningMotor = new CANSparkMax(turningMotorChannel, MotorType.kBrushless);
@@ -71,11 +74,15 @@ public class SwerveModule extends SubsystemBase {
         m_turningController = m_turningMotor.getPIDController();
         m_driveController = m_driveMotor.getPIDController();
 
+        m_turningController.setFF(0);
         m_turningController.setP(Constants.ModuleConstants.kTurningP);
+        m_turningController.setI(0);
         m_turningController.setD(Constants.ModuleConstants.kTurningD);
 
         m_driveController.setP(Constants.ModuleConstants.kDriveP);
         m_driveController.setD(Constants.ModuleConstants.kDriveD);
+
+        SmartDashboard.putNumber("Current thru bore: " + turningChannel, m_throughBoreEncoder.getAbsolutePosition());
     }
 
     /**
@@ -129,11 +136,15 @@ public class SwerveModule extends SubsystemBase {
             delta -= Math.signum(delta) * 180;
         }
 
-        Rotation2d adjustedAngle = Rotation2d.fromDegrees(delta + curAngle.getDegrees());
+        // Rotation2d adjustedAngle = Rotation2d.fromDegrees(delta + curAngle.getDegrees());
+        Rotation2d adjustedAngle = Rotation2d.fromDegrees(-500);
 
         m_turningController.setReference(adjustedAngle.getDegrees(), ControlType.kPosition);        
 
         SmartDashboard.putNumber("Commanded Velocity", driveOutput);
+        SmartDashboard.putNumber("Current position: " + turningChannel, m_turningEncoder.getPosition());
+        
+        SmartDashboard.putNumber("Commanded position: " + turningChannel, adjustedAngle.getDegrees());
 
         m_driveController.setReference(driveOutput, ControlType.kVelocity, 0, Constants.ModuleConstants.kDriveFF * driveOutput);
     }

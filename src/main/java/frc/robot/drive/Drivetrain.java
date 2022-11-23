@@ -111,7 +111,7 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("currentX", getPose().getX());
     SmartDashboard.putNumber("currentY", getPose().getY());
     SmartDashboard.putNumber("currentAngle", getPose().getRotation().getRadians());
-    SmartDashboard.putNumber("targetPoseAngle", m_targetPose.getRotation().getRadians());
+    // SmartDashboard.putNumber("targetPoseAngle", m_targetPose.getRotation().getRadians());
 
     // SmartDashboard.putNumber("FronLeft Turning CANcoder Mag Offset", modules[0].getTurnCANcoder().configGetMagnetOffset());
     // SmartDashboard.putNumber("FronLeft Turning CANcoder Abs Position", modules[0].getTurnCANcoder().getAbsolutePosition());

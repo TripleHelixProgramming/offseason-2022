@@ -22,10 +22,10 @@ public final class Constants {
       public static final int pdpPort = 0;
 
       //port #s for the encoders
-      public static final int kRearRightTurningEncoderPort = 31;
-      public static final int kFrontRightTurningEncoderPort = 33;
-      public static final int kFrontLeftTurningEncoderPort = 43;
-      public static final int kRearLeftTurningEncoderPort = 45;
+      public static final int kRearRightTurningEncoderPort = 0;
+      public static final int kFrontRightTurningEncoderPort = 1;
+      public static final int kFrontLeftTurningEncoderPort = 2;
+      public static final int kRearLeftTurningEncoderPort = 3;
 
       //port #s for the drive motors
       public static final int kRearRightDriveMotorPort = 10;
@@ -50,10 +50,10 @@ public final class Constants {
     public static final int REAR_LEFT = 2;
     public static final int REAR_RIGHT = 3;
     
-    public static final double kRearRightTurningEncoderOffset = 180.0;
-    public static final double kFrontRightTurningEncoderOffset = 180.0;
-    public static final double kFrontLeftTurningEncoderOffset = 180.0;
-    public static final double kRearLeftTurningEncoderOffset = 180.0;
+    public static final double kRearRightTurningEncoderOffset = 358.88184;
+    public static final double kFrontRightTurningEncoderOffset = 0.0;
+    public static final double kFrontLeftTurningEncoderOffset = 0.0;
+    public static final double kRearLeftTurningEncoderOffset = 0.0;
 
     public static final boolean kFrontLeftDriveEncoderReversed = false;
     public static final boolean kFrontRightDriveEncoderReversed = false;
@@ -111,9 +111,9 @@ public final class Constants {
     public static final double kDriveD = 0.0;
     public static final double kDriveFF = 2.96;
 
-    public static final double kTurningP = 0.01;
+    public static final double kTurningP = -0.01;
     public static final double kTurningI = 0.0;
-    public static final double kTurningD = 0.005;
+    public static final double kTurningD = 0.0;
     
     public static final double kMaxModuleAngularSpeedRadiansPerSecond = 0.000005 * Math.PI;
     public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 0.000005 * Math.PI;
@@ -127,7 +127,7 @@ public final class Constants {
     public static final double kDriveGearRatio = 5.5;
     public static final double kDriveConversionFactor = (kWheelDiameterMeters * Math.PI) / kDriveGearRatio;
 
-    public static final double kTurnPositionConversionFactor = 53.14;
+    public static final double kTurnPositionConversionFactor = 46.42;
   }
 
   public static final class OIConstants {
