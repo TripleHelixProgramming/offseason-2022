@@ -1,31 +1,25 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// Copyright (c) Triple Helix Robotics
 
-package frc.robot.drive;
+package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj.Preferences;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ElectricalConstants;
+import frc.robot.Constants.ModuleConstants;
 
 @SuppressWarnings("PMD.ExcessiveImports")
-public class Drivetrain extends SubsystemBase {
+public class SwerveDrive extends SubsystemBase {
 
-  private Preferences prefs = Preferences.getInstance();
   // Robot swerve modules
   private final SwerveModule m_frontLeft =
       new SwerveModule(
@@ -66,21 +60,16 @@ public class Drivetrain extends SubsystemBase {
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry;
-
-  //target pose and controller
-  Pose2d m_targetPose;
     
-  /** Creates a new DriveSubsystem. */
-  public Drivetrain() {
+  public SwerveDrive() {
 
-    // Zero out the gyro.
+    // Zero the gyro.
     m_ahrs.zeroYaw();
 
     m_odometry = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, getHeading());
 
     for (SwerveModule module: modules) {
       module.resetDistance();
-      module.syncTurningEncoders();
     }
   }
 
@@ -136,16 +125,6 @@ public class Drivetrain extends SubsystemBase {
   }
 
   /**
-   * Method to rotate the relative orientation of the target pose at a given rate.
-   *
-   * @param deltaTheta How much to rotate the target orientation per loop.
-   */
-  public void rotateRelative(Rotation2d deltaTheta) {
-    Transform2d transform = new Transform2d(new Translation2d(), deltaTheta);
-    m_targetPose = m_targetPose.transformBy(transform);
-  }
-
-  /**
    * Method to drive the robot with given velocities.
    *
    * @param speeds ChassisSpeeds object with the desired chassis speeds [m/s and rad/s].
@@ -157,13 +136,11 @@ public class Drivetrain extends SubsystemBase {
       brake();
       return;
     }
-
-    //double xDot, double yDot, double thetaDot, boolean fieldRelative
     
     SwerveModuleState[] swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
            
-    normalizeDrive(swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond, percents);
+    normalizeDrive(swerveModuleStates, ModuleConstants.kMaxSpeedMetersPerSecond, percents);
     setModuleStates(swerveModuleStates);
   }
 
@@ -181,7 +158,7 @@ public class Drivetrain extends SubsystemBase {
     double y = percents.vyMetersPerSecond;
     double theta = percents.omegaRadiansPerSecond;
 
-    // Find the how fast the fastest spinning drive motor is spinning                                       
+    // Identify fastest motor's speed.                                      
     double realMaxSpeed = 0.0;
     for (SwerveModuleState moduleState : desiredStates) {
       if (Math.abs(moduleState.speedMetersPerSecond) > realMaxSpeed) {
@@ -203,12 +180,9 @@ public class Drivetrain extends SubsystemBase {
    * @param desiredStates The desired SwerveModule states.
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates, prefs.getDouble("kMaxSpeedMetersPerSecond",DriveConstants.kMaxSpeedMetersPerSecond));
-
-        for (int i = 0; i <= 3; i++) {
-          modules[i].setDesiredState(desiredStates[i]);
-        }
+    for (int i = 0; i <= 3; i++) {
+      modules[i].setDesiredState(desiredStates[i]);
+    }
   }
 
   public SwerveModuleState[] getModuleStates() {
@@ -231,7 +205,6 @@ public class Drivetrain extends SubsystemBase {
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
     m_ahrs.zeroYaw();
-    m_targetPose = new Pose2d(new Translation2d(), new Rotation2d());
   }
 
   /**

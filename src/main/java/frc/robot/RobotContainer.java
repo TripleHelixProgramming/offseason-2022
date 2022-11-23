@@ -1,88 +1,40 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// Copyright (c) Triple Helix Robotics
 
 package frc.robot;
 
-import java.util.List;
+import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import static com.team2363.utilities.ControllerMap.*;
+
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.ElectricalConstants;
-import frc.robot.drive.Drivetrain;
-import frc.robot.drive.commands.JoystickDrive;
-import frc.robot.drive.commands.ResetEncoders;
-import frc.robot.oi.OI;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.JoystickDrive;
+import frc.robot.subsystems.SwerveDrive;
 
-/*
- * This class is where the bulk of the robot should be declared.  Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
- * (including subsystems, commands, and button mappings) should be declared here.
- */
 public class RobotContainer {
+  private final SwerveDrive drive = new SwerveDrive();
+  private Joystick driver = new Joystick(0);
 
-  private static RobotContainer INSTANCE;
-
-  /**
-   * @return retrieves the singleton instance of the Robot Container
-   */
-  public static RobotContainer getInstance() {
-    if (INSTANCE == null) {
-      INSTANCE = new RobotContainer();
-    }
-    return INSTANCE;
-  }
-
-  // The robot's subsystems
-  private final Drivetrain m_robotDrive = new Drivetrain();
-  private final PowerDistribution m_PDP = new PowerDistribution(ElectricalConstants.pdpPort, ElectricalConstants.pdpType);
-  private final OI m_OI = OI.getInstance();
-
-  /**
-   * The container for the robot. Contains subsystems, OI devices, and commands.
-   */
   public RobotContainer() {
+    configureButtonBindings();
 
-    m_OI.setDrivetrain(m_robotDrive);
-    m_OI.configureButtonBindings();
+    DoubleSupplier xAxis = () -> driver.getRawAxis(X_BOX_RIGHT_STICK_Y);
+    DoubleSupplier yAxis = () -> driver.getRawAxis(X_BOX_RIGHT_STICK_X);
+    DoubleSupplier thetaAxis = () -> driver.getRawAxis(X_BOX_LEFT_STICK_X);
 
-    SmartDashboard.putData("Reset Encoders", new ResetEncoders(m_robotDrive));
-
-    // Configure default commands
-    setDefaultCommands();
-
+    drive.setDefaultCommand(new JoystickDrive(drive, xAxis, yAxis, thetaAxis));
   }
 
-  private void setDefaultCommands() {
-    // m_robotDrive.setDefaultCommand(new RelativeOrientation(m_robotDrive));
-    m_robotDrive.setDefaultCommand(new JoystickDrive(m_robotDrive));
+  public Command getAutonomousCommand() {
+    return null;
   }
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling passing it to a
-   * {@link JoystickButton}.
-   */
+  public void configureButtonBindings() {
+    CommandScheduler.getInstance().clearButtons();
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  // public Command getAutonomousCommand() {
-    // return new Command();
-  // }
+    new JoystickButton(driver, RM_SF).whenPressed(new InstantCommand(drive::zeroHeading));
+  }
 }

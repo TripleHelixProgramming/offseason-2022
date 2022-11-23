@@ -1,6 +1,4 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// Copyright (c) Triple Helix Robotics
 
 package frc.robot;
 
@@ -8,14 +6,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 
-/**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants. This class should not be used for any other purpose. All constants should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
- *
- * <p>It is advised to statically import this class (or one of its inner classes) wherever the
- * constants are needed, to reduce verbosity.
- */
 public final class Constants {
   public static final class ElectricalConstants {
       public static final ModuleType pdpType = ModuleType.kCTRE;
@@ -91,17 +81,8 @@ public final class Constants {
 
     public static final boolean kGyroReversed = false;
 
-    // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
-    // These characterization values MUST be determined either experimentally or theoretically
-    // for *your* robot's drive.
-    // The RobotPy Characterization Toolsuite provides a convenient tool for obtaining these
-    // values for your robot.
-    /* I don't know if these are needed. They only appear here in the project. i.e. They are never used.
-    public static final double ksVolts = 1.0;
-    public static final double kvVoltSecondsPerMeter = 0.8;
-    public static final double kaVoltSecondsSquaredPerMeter = 0.15;
-    */
-    public static final double kMaxSpeedMetersPerSecond = 3.0;
+    // Is the joystick drive in field relative mode.
+    public static final boolean kFieldRelative = true;
   }
 
   public static final class ModuleConstants {
@@ -111,26 +92,30 @@ public final class Constants {
     public static final double kDriveD = 0.0;
     public static final double kDriveFF = 2.96;
 
-    public static final double kTurningP = -0.01;
-    public static final double kTurningI = 0.0;
-    public static final double kTurningD = 0.0;
-    
-    public static final double kMaxModuleAngularSpeedRadiansPerSecond = 0.000005 * Math.PI;
-    public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 0.000005 * Math.PI;
+    public static final double kSteerP = -0.01;
+    public static final double kSteerI = 0.0;
+    public static final double kSteerD = 0.0;
+    public static final double kSteerFF = 0.0;
 
-    // public static final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(0.254, 0.137);
-    
+    public static final double kMaxSpeedMetersPerSecond = 3.0; // meters
+
     public static final double kWheelDiameterMeters = 0.0762; // 3 in
+
+    // Gear reduction (unitless) between the drive motor and the wheel
+    public static final double kDriveGearRatio = 5.5;
 
     // The drive encoder reports in RPM by default. Calculate the conversion factor
     // to make it report in meters per second.
-    public static final double kDriveGearRatio = 5.5;
     public static final double kDriveConversionFactor = (kWheelDiameterMeters * Math.PI) / kDriveGearRatio;
 
+    // Gear reduction (unitless) between the steering motor and the module azimuth
+    // Stage 1 - REV Ultraplanetary nominal "4:1" stage, actual ratio 29:84
+    // Stage 2 - REV Ultraplanetary nominal "3:1" stage, actual ratio 21:76
+    // Stage 3 - 14:62
     public static final double kTurnPositionConversionFactor = 46.42;
-  }
 
-  public static final class OIConstants {
-    public static final int kDriverControllerPort = 0;
+    public static final int kNominalVoltage = 12;
+    public static final int kDriveCurrentLimit = 60;
+    public static final int kSteerCurrentLimit = 25;
   }
 }
