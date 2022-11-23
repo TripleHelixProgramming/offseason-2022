@@ -66,6 +66,14 @@ dependencies {
     simulationRelease wpi.sim.enableRelease()
 
     testImplementation 'junit:junit:4.13.1'
+
+    implementation 'com.github.TripleHelixProgramming:HelixUtilities:2022-SNAPSHOT'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "https://www.jitpack.io" }
 }
 
 // Simulation configuration (e.g. environment variables).
