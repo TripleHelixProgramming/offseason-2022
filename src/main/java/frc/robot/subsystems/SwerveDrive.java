@@ -140,7 +140,7 @@ public class SwerveDrive extends SubsystemBase {
     SwerveModuleState[] swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
            
-    normalizeDrive(swerveModuleStates, ModuleConstants.kMaxSpeedMetersPerSecond, percents);
+    normalizeDrive(swerveModuleStates, ModuleConstants.kMaxVelocity, percents);
     setModuleStates(swerveModuleStates);
   }
 
