@@ -35,12 +35,14 @@ public class SwerveModule extends SubsystemBase {
      * @param driveMotorChannel   CAN ID for the drive motor controller
      * @param steerMotorChannel   CAN ID for the steer motor controller
      * @param steerEncoderChannel   DIO port for the absolute encoder on the steer axis
+     * @param driveReversed   Reverses drive axis
      * @param steerEncoderOffset   Rotational transform between absolute encoder and wheel
      */
     public SwerveModule(
                         int driveMotorChannel,
                         int steerMotorChannel,
                         int steerEncoderChannel,
+//                        Boolean driveReversed,
                         Rotation2d steerEncoderOffset) {
 
         encoderOffset = steerEncoderOffset;
@@ -57,17 +59,25 @@ public class SwerveModule extends SubsystemBase {
         driveMotor.setIdleMode(IdleMode.kBrake);
         steerMotor.setIdleMode(IdleMode.kCoast);
 
+        // driveMotor.setInverted(driveReversed);
+        driveMotor.setInverted(false);
+        steerMotor.setInverted(false);
+
         driveMotor.enableVoltageCompensation(ModuleConstants.kNominalVoltage);
         steerMotor.enableVoltageCompensation(ModuleConstants.kNominalVoltage);
 
         driveMotor.setSmartCurrentLimit(ModuleConstants.kDriveCurrentLimit);
         steerMotor.setSmartCurrentLimit(ModuleConstants.kSteerCurrentLimit);
 
-        // driveEncoder returns RPM by default. Use setVelocityConversionFactor() to
-        // convert that to meters per second.
+        // -------------------- position --------------------- velocity
+        // default units ------ rotations of drive motor ----- RPM of drive motor
+        // converted units ---- meters traveled by wheel ----- meters per second at wheel tangent
         driveEncoder.setVelocityConversionFactor(ModuleConstants.kDriveConversionFactor / 60.0);
         driveEncoder.setPositionConversionFactor(ModuleConstants.kDriveConversionFactor);
 
+        // -------------------- position
+        // default units ------ rotations of steering motor
+        // converted units ---- degrees of rotation of module azimuth
         steerEncoder.setPositionConversionFactor(360.0 / ModuleConstants.kTurnPositionConversionFactor);
 
         driveController = driveMotor.getPIDController();
@@ -87,12 +97,18 @@ public class SwerveModule extends SubsystemBase {
         steerMotor.burnFlash();
 
         throughBoreEncoder = new DutyCycleEncoder(steerEncoderChannel);
-        steerEncoder.setPosition(getThroughBorePosition());
+        steerEncoder.setPosition(getAbsPosition().getDegrees());
     }
 
-    public double getThroughBorePosition() {
-        // Through bore encoder is in rotations, convert it to degrees.
-        return throughBoreEncoder.getAbsolutePosition() * 360 - encoderOffset.getDegrees();
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Encoder position: " + steerMotor.getDeviceId(), steerEncoder.getPosition());
+        SmartDashboard.putNumber("Current position: " + steerMotor.getDeviceId(), this.getAbsPosition().getDegrees());
+    }
+
+    public Rotation2d getAbsPosition() {
+        Rotation2d absolutePosition = Rotation2d.fromDegrees(throughBoreEncoder.getAbsolutePosition() * 360.0);
+        return absolutePosition.minus(encoderOffset);
     }
 
     /**
@@ -101,7 +117,8 @@ public class SwerveModule extends SubsystemBase {
      * @return The current state of the module.
      */
     public SwerveModuleState getState() {
-        return new SwerveModuleState(driveEncoder.getVelocity(), Rotation2d.fromDegrees(getThroughBorePosition()));
+        Rotation2d currentAngle = Rotation2d.fromDegrees(steerEncoder.getPosition());
+        return new SwerveModuleState(driveEncoder.getVelocity(), currentAngle);
     }
 
     /**
@@ -123,7 +140,6 @@ public class SwerveModule extends SubsystemBase {
         double adjustedAngle = delta + currentAngle;
 
         SmartDashboard.putNumber("Commanded Velocity" + steerMotor.getDeviceId(), driveOutput);
-        SmartDashboard.putNumber("Current position: " + steerMotor.getDeviceId(), steerEncoder.getPosition());
         SmartDashboard.putNumber("Commanded position: " + steerMotor.getDeviceId(), adjustedAngle);
 
         steerController.setReference(adjustedAngle, ControlType.kPosition);        

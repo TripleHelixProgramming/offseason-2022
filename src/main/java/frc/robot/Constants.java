@@ -42,20 +42,20 @@ public final class Constants {
     public static final int REAR_RIGHT = 3;
     
     // Rotational transformation between absolute encoder "north" and wheel "forward"
-    public static final Rotation2d kRearRightTurningEncoderOffset = Rotation2d.fromDegrees(358.88184);
-    public static final Rotation2d kFrontRightTurningEncoderOffset = Rotation2d.fromDegrees(0.0);
-    public static final Rotation2d kFrontLeftTurningEncoderOffset = Rotation2d.fromDegrees(0.0);
-    public static final Rotation2d kRearLeftTurningEncoderOffset = Rotation2d.fromDegrees(0.0);
+    public static final Rotation2d kRearRightTurningEncoderOffset = Rotation2d.fromDegrees(234.9);
+    public static final Rotation2d kFrontRightTurningEncoderOffset = Rotation2d.fromDegrees(140.5);
+    public static final Rotation2d kFrontLeftTurningEncoderOffset = Rotation2d.fromDegrees(344.9);
+    public static final Rotation2d kRearLeftTurningEncoderOffset = Rotation2d.fromDegrees(256.7);
 
-    public static final boolean kFrontLeftDriveEncoderReversed = false;
-    public static final boolean kFrontRightDriveEncoderReversed = false;
-    public static final boolean kRearLeftDriveEncoderReversed = true;
-    public static final boolean kRearRightDriveEncoderReversed = true;
+    // public static final boolean kFrontLeftDriveEncoderReversed = true;
+    // public static final boolean kFrontRightDriveEncoderReversed = false;
+    // public static final boolean kRearLeftDriveEncoderReversed = true;
+    // public static final boolean kRearRightDriveEncoderReversed = false;
 
-    public static final boolean kFrontLeftTurningEncoderReversed = false;
-    public static final boolean kFrontRightTurningEncoderReversed = false;
-    public static final boolean kRearLeftTurningEncoderReversed = true;
-    public static final boolean kRearRightTurningEncoderReversed = true;
+    // public static final boolean kFrontLeftTurningEncoderReversed = true;
+    // public static final boolean kFrontRightTurningEncoderReversed = true;
+    // public static final boolean kRearLeftTurningEncoderReversed = false;
+    // public static final boolean kRearRightTurningEncoderReversed = false;
 
     // Distance between centers of right and left wheels on robot
     // Units: meters
@@ -95,7 +95,7 @@ public final class Constants {
     public static final double kDriveD = 0.0;
     public static final double kDriveFF = 2.96;
 
-    public static final double kSteerP = -0.01;
+    public static final double kSteerP = 0.01;
     public static final double kSteerI = 0.0;
     public static final double kSteerD = 0.0;
     public static final double kSteerFF = 0.0;
