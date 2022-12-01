@@ -26,6 +26,7 @@ public class SwerveDrive extends SubsystemBase {
           ElectricalConstants.kFrontLeftDriveMotorPort,
           ElectricalConstants.kFrontLeftTurningMotorPort,
           ElectricalConstants.kFrontLeftTurningEncoderPort,
+          // DriveConstants.kFrontLeftDriveEncoderReversed,
           DriveConstants.kFrontLeftTurningEncoderOffset
           );
 
@@ -34,6 +35,7 @@ public class SwerveDrive extends SubsystemBase {
           ElectricalConstants.kFrontRightDriveMotorPort,
           ElectricalConstants.kFrontRightTurningMotorPort,
           ElectricalConstants.kFrontRightTurningEncoderPort,
+          // DriveConstants.kFrontRightDriveEncoderReversed,
           DriveConstants.kFrontRightTurningEncoderOffset
           );
 
@@ -42,6 +44,7 @@ public class SwerveDrive extends SubsystemBase {
           ElectricalConstants.kRearLeftDriveMotorPort,
           ElectricalConstants.kRearLeftTurningMotorPort,
           ElectricalConstants.kRearLeftTurningEncoderPort,
+          // DriveConstants.kRearLeftDriveEncoderReversed,
           DriveConstants.kRearLeftTurningEncoderOffset
           );
 
@@ -50,6 +53,7 @@ public class SwerveDrive extends SubsystemBase {
           ElectricalConstants.kRearRightDriveMotorPort,
           ElectricalConstants.kRearRightTurningMotorPort,
           ElectricalConstants.kRearRightTurningEncoderPort,
+          // DriveConstants.kRearRightDriveEncoderReversed,
           DriveConstants.kRearRightTurningEncoderOffset
           );
 
@@ -140,7 +144,7 @@ public class SwerveDrive extends SubsystemBase {
     SwerveModuleState[] swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
            
-    normalizeDrive(swerveModuleStates, ModuleConstants.kMaxSpeedMetersPerSecond, percents);
+    normalizeDrive(swerveModuleStates, ModuleConstants.kMaxVelocity, percents);
     setModuleStates(swerveModuleStates);
   }
 
