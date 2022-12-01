@@ -49,17 +49,18 @@ public class SwerveModule extends SubsystemBase {
         driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
         steerMotor = new CANSparkMax(steerMotorChannel, MotorType.kBrushless);
 
+        //resets the sparkMAXs to their factory defaults
         steerMotor.restoreFactoryDefaults();
 
+        //easy encoder refrences
         driveEncoder = driveMotor.getEncoder();
         steerEncoder = steerMotor.getEncoder();
-
-
 
         throughBoreEncoder = new DutyCycleEncoder(steerEncoderChannel);
         
         encoderOffset = Rotation2d.fromDegrees(steerEncoderOffsetDegrees);
 
+        //tells the motor what we want it to do without any input
         driveMotor.setIdleMode(IdleMode.kBrake);
         steerMotor.setIdleMode(IdleMode.kCoast);
 
@@ -80,7 +81,7 @@ public class SwerveModule extends SubsystemBase {
         driveController = driveMotor.getPIDController();
 
         //maybe reset the motor's position???
-        steerController.setReference(0.0, ControlType.kPosition);  
+        steerController.setReference(0.0, ControlType.kPosition);
 
         steerController.setP(ModuleConstants.kSteerP);
         steerController.setI(ModuleConstants.kSteerI);
