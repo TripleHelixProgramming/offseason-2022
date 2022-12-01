@@ -40,7 +40,7 @@ public final class Constants {
     public static final int REAR_LEFT = 2;
     public static final int REAR_RIGHT = 3;
     
-    public static final double kRearRightTurningEncoderOffset = 358.88184;
+    public static final double kRearRightTurningEncoderOffset = 0.0;
     public static final double kFrontRightTurningEncoderOffset = 0.0;
     public static final double kFrontLeftTurningEncoderOffset = 0.0;
     public static final double kRearLeftTurningEncoderOffset = 0.0;
