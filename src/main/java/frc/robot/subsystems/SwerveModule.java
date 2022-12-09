@@ -24,7 +24,8 @@ public class SwerveModule extends SubsystemBase {
 
     private final DutyCycleEncoder throughBoreEncoder;
     
-    private final Rotation2d encoderOffset;
+    private final Rotation2d absoluteOffset;
+    private Rotation2d relativeOffset;
 
     private final SparkMaxPIDController steerController;
     private final SparkMaxPIDController driveController; 
@@ -45,8 +46,6 @@ public class SwerveModule extends SubsystemBase {
 //                        Boolean driveReversed,
                         Rotation2d steerEncoderOffset) {
 
-        encoderOffset = steerEncoderOffset;
-
         driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
         steerMotor = new CANSparkMax(steerMotorChannel, MotorType.kBrushless);
 
@@ -56,7 +55,7 @@ public class SwerveModule extends SubsystemBase {
         driveEncoder = driveMotor.getEncoder();
         steerEncoder = steerMotor.getEncoder();
 
-        driveMotor.setIdleMode(IdleMode.kBrake);
+        driveMotor.setIdleMode(IdleMode.kCoast);
         steerMotor.setIdleMode(IdleMode.kCoast);
 
         // driveMotor.setInverted(driveReversed);
@@ -97,18 +96,30 @@ public class SwerveModule extends SubsystemBase {
         steerMotor.burnFlash();
 
         throughBoreEncoder = new DutyCycleEncoder(steerEncoderChannel);
-        steerEncoder.setPosition(getAbsPosition().getDegrees());
+
+        absoluteOffset = steerEncoderOffset;
+
+        syncEncoders();
+
+        SmartDashboard.putNumber("Initial absolute position: " + steerMotor.getDeviceId(), getAbsPosition().getDegrees());
+        SmartDashboard.putNumber("Initial relative position: " + steerMotor.getDeviceId(), getRelativePosition().getDegrees());
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Encoder position: " + steerMotor.getDeviceId(), steerEncoder.getPosition());
-        SmartDashboard.putNumber("Current position: " + steerMotor.getDeviceId(), this.getAbsPosition().getDegrees());
+        SmartDashboard.putNumber("Drive velocity: " + steerMotor.getDeviceId(), getState().speedMetersPerSecond);
+        SmartDashboard.putNumber("Relative position: " + steerMotor.getDeviceId(), getRelativePosition().getDegrees());
+        SmartDashboard.putNumber("Absolute position: " + steerMotor.getDeviceId(), getAbsPosition().getDegrees());
+        SmartDashboard.putNumber("Drive position: " + steerMotor.getDeviceId(), getDriveDistance());
     }
 
     public Rotation2d getAbsPosition() {
-        Rotation2d absolutePosition = Rotation2d.fromDegrees(throughBoreEncoder.getAbsolutePosition() * 360.0);
-        return absolutePosition.minus(encoderOffset);
+        Rotation2d absolutePosition = Rotation2d.fromDegrees(-throughBoreEncoder.getAbsolutePosition() * 360.0);
+        return absolutePosition.minus(absoluteOffset);
+    }
+
+    public Rotation2d getRelativePosition() {
+        return Rotation2d.fromDegrees(steerEncoder.getPosition()).minus(relativeOffset);
     }
 
     /**
@@ -117,8 +128,7 @@ public class SwerveModule extends SubsystemBase {
      * @return The current state of the module.
      */
     public SwerveModuleState getState() {
-        Rotation2d currentAngle = Rotation2d.fromDegrees(steerEncoder.getPosition());
-        return new SwerveModuleState(driveEncoder.getVelocity(), currentAngle);
+        return new SwerveModuleState(driveEncoder.getVelocity(), getRelativePosition());
     }
 
     /**
@@ -128,7 +138,7 @@ public class SwerveModule extends SubsystemBase {
      *              degrees).
      */
     public void setDesiredState(SwerveModuleState state) {
-        double currentAngle = steerEncoder.getPosition();
+        double currentAngle = getRelativePosition().getDegrees();
         double delta = deltaAdjustedAngle(state.angle.getDegrees(), currentAngle);
         double driveOutput = state.speedMetersPerSecond;
 
@@ -142,7 +152,7 @@ public class SwerveModule extends SubsystemBase {
         SmartDashboard.putNumber("Commanded Velocity" + steerMotor.getDeviceId(), driveOutput);
         SmartDashboard.putNumber("Commanded position: " + steerMotor.getDeviceId(), adjustedAngle);
 
-        steerController.setReference(adjustedAngle, ControlType.kPosition);        
+        steerController.setReference(adjustedAngle+relativeOffset.getDegrees(), ControlType.kPosition);        
         driveController.setReference(driveOutput, ControlType.kVelocity);
     }
 
@@ -158,5 +168,9 @@ public class SwerveModule extends SubsystemBase {
 
     public void resetDistance() {
         driveEncoder.setPosition(0.0);
+    }
+
+    public void syncEncoders() {
+        relativeOffset = Rotation2d.fromDegrees(steerEncoder.getPosition() - getAbsPosition().getDegrees());
     }
 }

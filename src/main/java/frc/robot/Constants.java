@@ -42,10 +42,10 @@ public final class Constants {
     public static final int REAR_RIGHT = 3;
     
     // Rotational transformation between absolute encoder "north" and wheel "forward"
-    public static final Rotation2d kRearRightTurningEncoderOffset = Rotation2d.fromDegrees(234.9);
-    public static final Rotation2d kFrontRightTurningEncoderOffset = Rotation2d.fromDegrees(140.5);
-    public static final Rotation2d kFrontLeftTurningEncoderOffset = Rotation2d.fromDegrees(344.9);
-    public static final Rotation2d kRearLeftTurningEncoderOffset = Rotation2d.fromDegrees(256.7);
+    public static final Rotation2d kRearRightTurningEncoderOffset = Rotation2d.fromDegrees(-64.2679);
+    public static final Rotation2d kFrontRightTurningEncoderOffset = Rotation2d.fromDegrees(44.23);
+    public static final Rotation2d kFrontLeftTurningEncoderOffset = Rotation2d.fromDegrees(15.19);
+    public static final Rotation2d kRearLeftTurningEncoderOffset = Rotation2d.fromDegrees(99.36);
 
     // public static final boolean kFrontLeftDriveEncoderReversed = true;
     // public static final boolean kFrontRightDriveEncoderReversed = false;
@@ -66,10 +66,10 @@ public final class Constants {
     public static final double kWheelBase = 0.6223; // 24.5 in
 
     // Units: meters per second
-    public static final double kMaxTranslationalVelocity = 0.75; //max 4.5
+    public static final double kMaxTranslationalVelocity = 1.0; //max 4.5
 
     // Units: radians per second
-    public static final double kMaxRotationalVelocity = 5.0; //max 5.0
+    public static final double kMaxRotationalVelocity = 2.5; //max 5.0
 
     //The locations for the modules must be relative to the center of the robot. 
     // Positive x values represent moving toward the front of the robot 
@@ -90,12 +90,12 @@ public final class Constants {
 
   public static final class ModuleConstants {
 
-    public static final double kDriveP = 0.1;
+    public static final double kDriveP = 0.025;
     public static final double kDriveI = 0.0;
     public static final double kDriveD = 0.0;
-    public static final double kDriveFF = 2.96;
+    public static final double kDriveFF = 0.25;
 
-    public static final double kSteerP = 0.01;
+    public static final double kSteerP = 0.0075;
     public static final double kSteerI = 0.0;
     public static final double kSteerD = 0.0;
     public static final double kSteerFF = 0.0;

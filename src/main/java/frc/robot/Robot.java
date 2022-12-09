@@ -31,6 +31,7 @@ public class Robot extends TimedRobot {
     if (ControllerPatroller.getPatroller().controllersChanged()) {
       robotContainer.configureButtonBindings();
     }
+    robotContainer.syncEncoders();
   }
 
   @Override

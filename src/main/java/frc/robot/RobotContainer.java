@@ -32,9 +32,13 @@ public class RobotContainer {
     return null;
   }
 
+  public void syncEncoders() {
+    drive.syncEncoders();
+  }
+
   public void configureButtonBindings() {
     CommandScheduler.getInstance().clearButtons();
 
-    new JoystickButton(driver, RM_SF).whenPressed(new InstantCommand(drive::zeroHeading));
+    new JoystickButton(driver, X_BOX_A).whenPressed(new InstantCommand(drive::zeroHeading));
   }
 }

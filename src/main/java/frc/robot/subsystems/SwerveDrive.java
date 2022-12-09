@@ -219,4 +219,10 @@ public class SwerveDrive extends SubsystemBase {
   public Rotation2d getHeading() {
     return m_ahrs.getRotation2d();
   }
+
+  public void syncEncoders() {
+    for (SwerveModule module : modules) {
+      module.syncEncoders();
+    }
+  }
 }
